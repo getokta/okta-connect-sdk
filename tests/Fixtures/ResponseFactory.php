@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests\Fixtures;
+namespace Okta\Connect\WhatsApp\Tests\Fixtures;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
-use Okta\WhatsApp\Client;
-use Okta\WhatsApp\Config;
-use Okta\WhatsApp\Http\HttpClient;
+use Okta\Connect\WhatsApp\Client;
+use Okta\Connect\WhatsApp\Config;
+use Okta\Connect\WhatsApp\Http\HttpClient;
 
 /**
  * Boilerplate for spinning up a Client around a Guzzle MockHandler.

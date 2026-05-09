@@ -10,7 +10,7 @@
          beStrictAboutOutputDuringTests="true"
          displayDetailsOnTestsThatTriggerWarnings="true">
     <testsuites>
-        <testsuite name="WhatsApp SDK">
+        <testsuite name="Okta Connect SDK">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

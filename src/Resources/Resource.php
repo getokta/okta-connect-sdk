@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Resources;
+namespace Okta\Connect\WhatsApp\Resources;
 
-use Okta\WhatsApp\Http\HttpClientInterface;
+use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 
 /**
  * Shared scaffolding for resource clients.

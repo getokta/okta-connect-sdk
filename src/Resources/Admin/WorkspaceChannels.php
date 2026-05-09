@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Resources\Admin;
+namespace Okta\Connect\WhatsApp\Resources\Admin;
 
-use Okta\WhatsApp\DTO\Channel;
-use Okta\WhatsApp\DTO\PaginatedResult;
-use Okta\WhatsApp\Resources\Resource;
+use Okta\Connect\WhatsApp\DTO\Channel;
+use Okta\Connect\WhatsApp\DTO\PaginatedResult;
+use Okta\Connect\WhatsApp\Resources\Resource;
 
 final class WorkspaceChannels extends Resource
 {

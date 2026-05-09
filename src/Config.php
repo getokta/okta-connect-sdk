@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp;
+namespace Okta\Connect\WhatsApp;
 
 use Psr\Http\Client\ClientInterface;
 
@@ -21,7 +21,7 @@ final class Config
         public readonly int $timeout = 30,
         public readonly int $retries = 2,
         public readonly ?ClientInterface $httpClient = null,
-        public readonly string $userAgent = 'okta-whatsapp-sdk-php/0.1',
+        public readonly string $userAgent = 'okta-connect-sdk-php/0.2',
     ) {
     }
 

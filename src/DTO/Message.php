@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\DTO;
+namespace Okta\Connect\WhatsApp\DTO;
 
-use Okta\WhatsApp\Enums\MessageStatus;
-use Okta\WhatsApp\Enums\MessageType;
+use Okta\Connect\WhatsApp\Enums\MessageStatus;
+use Okta\Connect\WhatsApp\Enums\MessageType;
 
 /**
  * Represents a WhatsApp message as returned by the API.

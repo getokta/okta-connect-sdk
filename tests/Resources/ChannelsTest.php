@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests\Resources;
+namespace Okta\Connect\WhatsApp\Tests\Resources;
 
-use Okta\WhatsApp\Enums\ChannelType;
-use Okta\WhatsApp\Tests\Fixtures\ResponseFactory;
+use Okta\Connect\WhatsApp\Enums\ChannelType;
+use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
 final class ChannelsTest extends TestCase

@@ -1,9 +1,9 @@
 {
-    "name": "getokta/whatsapp-sdk",
-    "description": "Official PHP SDK for the Okta WhatsApp platform.",
+    "name": "getokta/okta-connect-sdk",
+    "description": "Official PHP SDK for Okta Connect — the omnichannel messaging platform (WhatsApp first; SMS / Email to follow).",
     "type": "library",
     "license": "MIT",
-    "keywords": ["whatsapp", "sdk", "okta", "messaging"],
+    "keywords": ["okta", "connect", "whatsapp", "sdk", "messaging", "omnichannel"],
     "require": {
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.8",
@@ -17,12 +17,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Okta\\WhatsApp\\": "src/"
+            "Okta\\Connect\\WhatsApp\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Okta\\WhatsApp\\Tests\\": "tests/"
+            "Okta\\Connect\\WhatsApp\\Tests\\": "tests/"
         }
     },
     "scripts": {

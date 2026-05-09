@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Http;
+namespace Okta\Connect\WhatsApp\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request as Psr7Request;
-use Okta\WhatsApp\Config;
-use Okta\WhatsApp\Exceptions\AuthenticationException;
-use Okta\WhatsApp\Exceptions\AuthorizationException;
-use Okta\WhatsApp\Exceptions\NotFoundException;
-use Okta\WhatsApp\Exceptions\RateLimitException;
-use Okta\WhatsApp\Exceptions\ServerException;
-use Okta\WhatsApp\Exceptions\ValidationException;
-use Okta\WhatsApp\Exceptions\WhatsAppException;
+use Okta\Connect\WhatsApp\Config;
+use Okta\Connect\WhatsApp\Exceptions\AuthenticationException;
+use Okta\Connect\WhatsApp\Exceptions\AuthorizationException;
+use Okta\Connect\WhatsApp\Exceptions\NotFoundException;
+use Okta\Connect\WhatsApp\Exceptions\RateLimitException;
+use Okta\Connect\WhatsApp\Exceptions\ServerException;
+use Okta\Connect\WhatsApp\Exceptions\ValidationException;
+use Okta\Connect\WhatsApp\Exceptions\WhatsAppException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;

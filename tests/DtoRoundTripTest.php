@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests;
+namespace Okta\Connect\WhatsApp\Tests;
 
-use Okta\WhatsApp\DTO\Channel;
-use Okta\WhatsApp\DTO\Contact;
-use Okta\WhatsApp\DTO\Conversation;
-use Okta\WhatsApp\DTO\Message;
-use Okta\WhatsApp\DTO\PaginatedResult;
-use Okta\WhatsApp\DTO\Workspace;
-use Okta\WhatsApp\DTO\WorkspaceToken;
-use Okta\WhatsApp\DTO\WorkspaceUser;
+use Okta\Connect\WhatsApp\DTO\Channel;
+use Okta\Connect\WhatsApp\DTO\Contact;
+use Okta\Connect\WhatsApp\DTO\Conversation;
+use Okta\Connect\WhatsApp\DTO\Message;
+use Okta\Connect\WhatsApp\DTO\PaginatedResult;
+use Okta\Connect\WhatsApp\DTO\Workspace;
+use Okta\Connect\WhatsApp\DTO\WorkspaceToken;
+use Okta\Connect\WhatsApp\DTO\WorkspaceUser;
 use PHPUnit\Framework\TestCase;
 
 final class DtoRoundTripTest extends TestCase

@@ -1,51 +1,18 @@
-# Okta WhatsApp PHP SDK
+# Okta Connect PHP SDK
 
 [![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue)](https://www.php.net/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](#)
 
-A framework-agnostic PHP client for the Okta WhatsApp platform's HTTP API. Wraps the tenant
-messaging endpoints and the platform-admin workspace-management endpoints into a typed,
-testable client. No Laravel dependency in the SDK code itself — a separate
-`getokta/whatsapp-sdk-laravel` bridge package will be published later.
-
-> **Status:** Phase 1A monorepo package. Lives at `packages/whatsapp-sdk/` inside
-> `getokta/okta-whatsapp` until it is split out via `git subtree split` into its own
-> repository at `getokta/okta-whatsapp-sdk` and published to Packagist.
+A framework-agnostic PHP client for the **Okta Connect** omnichannel messaging platform.
+WhatsApp ships first; SMS and email channels follow under the same client surface
+(`Okta\Connect\<Channel>\*`). No Laravel dependency in the SDK code itself — a separate
+`getokta/okta-connect-sdk-laravel` bridge package will be published later.
 
 ## Installation
 
-### From this monorepo (current state)
-
-While the package lives inside `getokta/okta-whatsapp`, consumer apps install it via a Composer
-path repository pointing at their local checkout:
-
-```jsonc
-// composer.json (consumer app, e.g. tahdirit/okta-web)
-{
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../okta-whatsapp/packages/whatsapp-sdk",
-            "options": { "symlink": true }
-        }
-    ],
-    "require": {
-        "getokta/whatsapp-sdk": "@dev"
-    }
-}
-```
-
-Then:
-
 ```bash
-composer require getokta/whatsapp-sdk:@dev
-```
-
-### From Packagist (after extraction to `getokta/okta-whatsapp-sdk`)
-
-```bash
-composer require getokta/whatsapp-sdk
+composer require getokta/okta-connect-sdk
 ```
 
 ## Quickstart
@@ -53,10 +20,10 @@ composer require getokta/whatsapp-sdk
 ### Tenant scope (read / write / send)
 
 ```php
-use Okta\WhatsApp\Client;
+use Okta\Connect\WhatsApp\Client;
 
 $client = new Client(
-    baseUrl: 'https://wa.example.com',
+    baseUrl: 'https://connect.example.com',
     token: 'sanctum_token_here',
     options: ['timeout' => 30, 'retries' => 2],
 );
@@ -115,7 +82,7 @@ $client->messages()->send($payload, idempotencyKey: 'order-1234-confirmation');
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `baseUrl` | `string` | _required_ | Root URL of the okta-whatsapp API, e.g. `https://wa.example.com`. |
+| `baseUrl` | `string` | _required_ | Root URL of the Okta Connect API, e.g. `https://connect.example.com`. |
 | `token` | `string` | _required_ | Sanctum personal-access token. Abilities determine which endpoints succeed. |
 | `timeout` | `int` | `30` | Request timeout in seconds. |
 | `retries` | `int` | `2` | Retry budget for 429 + 5xx responses (exponential backoff, base 250 ms). |
@@ -123,7 +90,7 @@ $client->messages()->send($payload, idempotencyKey: 'order-1234-confirmation');
 
 ## Error handling
 
-All non-2xx responses raise typed exceptions extending `Okta\WhatsApp\Exceptions\WhatsAppException`:
+All non-2xx responses raise typed exceptions extending `Okta\Connect\WhatsApp\Exceptions\WhatsAppException`:
 
 | Exception | HTTP | Meaning |
 |---|---|---|
@@ -137,15 +104,9 @@ All non-2xx responses raise typed exceptions extending `Okta\WhatsApp\Exceptions
 
 Each exception exposes `->statusCode()`, `->responseBody()`, and the original PSR-7 response.
 
-## API documentation
-
-See the platform docs at [`docs/`](../../docs/) (relative to the monorepo root) and the
-`scribe`-generated reference under `.scribe/` for full request/response shapes.
-
 ## Running the tests
 
 ```bash
-cd packages/whatsapp-sdk
 composer install
 vendor/bin/phpunit
 ```

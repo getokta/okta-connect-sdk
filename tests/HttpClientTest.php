@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests;
+namespace Okta\Connect\WhatsApp\Tests;
 
-use Okta\WhatsApp\Exceptions\AuthenticationException;
-use Okta\WhatsApp\Exceptions\AuthorizationException;
-use Okta\WhatsApp\Exceptions\NotFoundException;
-use Okta\WhatsApp\Exceptions\RateLimitException;
-use Okta\WhatsApp\Exceptions\ServerException;
-use Okta\WhatsApp\Exceptions\ValidationException;
-use Okta\WhatsApp\Exceptions\WhatsAppException;
-use Okta\WhatsApp\Tests\Fixtures\ResponseFactory;
+use Okta\Connect\WhatsApp\Exceptions\AuthenticationException;
+use Okta\Connect\WhatsApp\Exceptions\AuthorizationException;
+use Okta\Connect\WhatsApp\Exceptions\NotFoundException;
+use Okta\Connect\WhatsApp\Exceptions\RateLimitException;
+use Okta\Connect\WhatsApp\Exceptions\ServerException;
+use Okta\Connect\WhatsApp\Exceptions\ValidationException;
+use Okta\Connect\WhatsApp\Exceptions\WhatsAppException;
+use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
 final class HttpClientTest extends TestCase
