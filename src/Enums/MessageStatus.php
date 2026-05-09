@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Enums;
+namespace Okta\Connect\WhatsApp\Enums;
 
 enum MessageStatus: string
 {

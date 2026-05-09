@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Resources\Admin;
+namespace Okta\Connect\WhatsApp\Resources\Admin;
 
-use Okta\WhatsApp\DTO\WorkspaceToken;
-use Okta\WhatsApp\Resources\Resource;
+use Okta\Connect\WhatsApp\DTO\WorkspaceToken;
+use Okta\Connect\WhatsApp\Resources\Resource;
 
 final class WorkspaceTokens extends Resource
 {

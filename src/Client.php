@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp;
+namespace Okta\Connect\WhatsApp;
 
-use Okta\WhatsApp\Http\HttpClient;
-use Okta\WhatsApp\Http\HttpClientInterface;
-use Okta\WhatsApp\Resources\Channels;
-use Okta\WhatsApp\Resources\Contacts;
-use Okta\WhatsApp\Resources\Conversations;
-use Okta\WhatsApp\Resources\Messages;
-use Okta\WhatsApp\Resources\Webhooks;
+use Okta\Connect\WhatsApp\Http\HttpClient;
+use Okta\Connect\WhatsApp\Http\HttpClientInterface;
+use Okta\Connect\WhatsApp\Resources\Channels;
+use Okta\Connect\WhatsApp\Resources\Contacts;
+use Okta\Connect\WhatsApp\Resources\Conversations;
+use Okta\Connect\WhatsApp\Resources\Messages;
+use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -46,7 +46,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-whatsapp-sdk-php/0.1',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.2',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Exceptions;
+namespace Okta\Connect\WhatsApp\Exceptions;
 
-use Okta\WhatsApp\Http\Response;
+use Okta\Connect\WhatsApp\Http\Response;
 use RuntimeException;
 use Throwable;
 

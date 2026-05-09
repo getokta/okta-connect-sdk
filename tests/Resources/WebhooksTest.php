@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests\Resources;
+namespace Okta\Connect\WhatsApp\Tests\Resources;
 
-use Okta\WhatsApp\Tests\Fixtures\ResponseFactory;
+use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
 final class WebhooksTest extends TestCase

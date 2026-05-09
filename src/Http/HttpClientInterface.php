@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Http;
+namespace Okta\Connect\WhatsApp\Http;
 
 /**
  * Minimal contract every transport must satisfy.

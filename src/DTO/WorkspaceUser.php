@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\DTO;
+namespace Okta\Connect\WhatsApp\DTO;
 
 final class WorkspaceUser
 {

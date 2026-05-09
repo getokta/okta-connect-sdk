@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Tests;
+namespace Okta\Connect\WhatsApp\Tests;
 
-use Okta\WhatsApp\AdminClient;
-use Okta\WhatsApp\Client;
-use Okta\WhatsApp\Config;
-use Okta\WhatsApp\Resources\Channels;
-use Okta\WhatsApp\Resources\Contacts;
-use Okta\WhatsApp\Resources\Conversations;
-use Okta\WhatsApp\Resources\Messages;
-use Okta\WhatsApp\Resources\Webhooks;
-use Okta\WhatsApp\Tests\Fixtures\ResponseFactory;
+use Okta\Connect\WhatsApp\AdminClient;
+use Okta\Connect\WhatsApp\Client;
+use Okta\Connect\WhatsApp\Config;
+use Okta\Connect\WhatsApp\Resources\Channels;
+use Okta\Connect\WhatsApp\Resources\Contacts;
+use Okta\Connect\WhatsApp\Resources\Conversations;
+use Okta\Connect\WhatsApp\Resources\Messages;
+use Okta\Connect\WhatsApp\Resources\Webhooks;
+use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
 final class ClientTest extends TestCase

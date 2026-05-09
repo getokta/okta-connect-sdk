@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Resources;
+namespace Okta\Connect\WhatsApp\Resources;
 
 /**
  * Webhook subscription management.

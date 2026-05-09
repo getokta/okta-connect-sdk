@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\DTO;
+namespace Okta\Connect\WhatsApp\DTO;
 
-use Okta\WhatsApp\Enums\ChannelType;
+use Okta\Connect\WhatsApp\Enums\ChannelType;
 
 final class Channel
 {

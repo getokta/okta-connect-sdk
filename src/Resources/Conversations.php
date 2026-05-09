@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp\Resources;
+namespace Okta\Connect\WhatsApp\Resources;
 
-use Okta\WhatsApp\DTO\Conversation;
-use Okta\WhatsApp\DTO\Message;
-use Okta\WhatsApp\DTO\PaginatedResult;
+use Okta\Connect\WhatsApp\DTO\Conversation;
+use Okta\Connect\WhatsApp\DTO\Message;
+use Okta\Connect\WhatsApp\DTO\PaginatedResult;
 
 final class Conversations extends Resource
 {

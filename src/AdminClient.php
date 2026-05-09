@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Okta\WhatsApp;
+namespace Okta\Connect\WhatsApp;
 
-use Okta\WhatsApp\Http\HttpClientInterface;
-use Okta\WhatsApp\Resources\Admin\WorkspaceChannels;
-use Okta\WhatsApp\Resources\Admin\WorkspaceTokens;
-use Okta\WhatsApp\Resources\Admin\WorkspaceUsers;
-use Okta\WhatsApp\Resources\Admin\Workspaces;
+use Okta\Connect\WhatsApp\Http\HttpClientInterface;
+use Okta\Connect\WhatsApp\Resources\Admin\WorkspaceChannels;
+use Okta\Connect\WhatsApp\Resources\Admin\WorkspaceTokens;
+use Okta\Connect\WhatsApp\Resources\Admin\WorkspaceUsers;
+use Okta\Connect\WhatsApp\Resources\Admin\Workspaces;
 
 /**
  * Namespace facade for the platform-admin endpoints.
