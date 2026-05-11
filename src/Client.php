@@ -9,6 +9,7 @@ use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 use Okta\Connect\WhatsApp\Resources\Channels;
 use Okta\Connect\WhatsApp\Resources\Contacts;
 use Okta\Connect\WhatsApp\Resources\Conversations;
+use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Messages;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
@@ -29,6 +30,7 @@ final class Client
     private ?Contacts $contacts = null;
     private ?Channels $channels = null;
     private ?Webhooks $webhooks = null;
+    private ?Meta $meta = null;
     private ?AdminClient $admin = null;
 
     /**
@@ -46,7 +48,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.2',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.3',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);
@@ -95,6 +97,15 @@ final class Client
     public function webhooks(): Webhooks
     {
         return $this->webhooks ??= new Webhooks($this->http);
+    }
+
+    /**
+     * WhatsApp Embedded Signup (Meta) — driven natively from the
+     * partner UI, no platform iframe required.
+     */
+    public function meta(): Meta
+    {
+        return $this->meta ??= new Meta($this->http);
     }
 
     public function admin(): AdminClient
