@@ -60,9 +60,9 @@ final class HttpClient implements HttpClientInterface
         return $this->send('PUT', $this->buildUrl($path), $body, $headers);
     }
 
-    public function delete(string $path, array $headers = []): Response
+    public function delete(string $path, array $body = [], array $headers = []): Response
     {
-        return $this->send('DELETE', $this->buildUrl($path), null, $headers);
+        return $this->send('DELETE', $this->buildUrl($path), $body !== [] ? $body : null, $headers);
     }
 
     /**
