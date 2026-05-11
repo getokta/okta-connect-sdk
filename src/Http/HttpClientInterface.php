@@ -33,5 +33,11 @@ interface HttpClientInterface
      */
     public function put(string $path, array $body = [], array $headers = []): Response;
 
-    public function delete(string $path, array $headers = []): Response;
+    /**
+     * @param  array<string, mixed>  $body  optional JSON body — some endpoints
+     *                                      (e.g. bulk-remove) accept payloads
+     *                                      on DELETE per their REST contract.
+     * @param  array<string, string>  $headers
+     */
+    public function delete(string $path, array $body = [], array $headers = []): Response;
 }

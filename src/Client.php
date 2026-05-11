@@ -9,6 +9,7 @@ use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 use Okta\Connect\WhatsApp\Resources\Channels;
 use Okta\Connect\WhatsApp\Resources\Contacts;
 use Okta\Connect\WhatsApp\Resources\Conversations;
+use Okta\Connect\WhatsApp\Resources\Groups;
 use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
 use Okta\Connect\WhatsApp\Resources\Messages;
@@ -33,6 +34,7 @@ final class Client
     private ?Webhooks $webhooks = null;
     private ?Meta $meta = null;
     private ?QrPairing $qr = null;
+    private ?Groups $groups = null;
     private ?AdminClient $admin = null;
 
     /**
@@ -117,6 +119,15 @@ final class Client
     public function qr(): QrPairing
     {
         return $this->qr ??= new QrPairing($this->http);
+    }
+
+    /**
+     * WhatsApp groups (Baileys-only). List/get + create/rename/
+     * add/remove members + change picture + force resync.
+     */
+    public function groups(): Groups
+    {
+        return $this->groups ??= new Groups($this->http);
     }
 
     public function admin(): AdminClient
