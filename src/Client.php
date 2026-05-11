@@ -10,6 +10,7 @@ use Okta\Connect\WhatsApp\Resources\Channels;
 use Okta\Connect\WhatsApp\Resources\Contacts;
 use Okta\Connect\WhatsApp\Resources\Conversations;
 use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
+use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
 use Okta\Connect\WhatsApp\Resources\Messages;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
@@ -31,6 +32,7 @@ final class Client
     private ?Channels $channels = null;
     private ?Webhooks $webhooks = null;
     private ?Meta $meta = null;
+    private ?QrPairing $qr = null;
     private ?AdminClient $admin = null;
 
     /**
@@ -48,7 +50,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.3',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.4',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);
@@ -106,6 +108,15 @@ final class Client
     public function meta(): Meta
     {
         return $this->meta ??= new Meta($this->http);
+    }
+
+    /**
+     * QR pairing flow — companion to Meta Embedded Signup for
+     * businesses that don't have a Cloud-API setup.
+     */
+    public function qr(): QrPairing
+    {
+        return $this->qr ??= new QrPairing($this->http);
     }
 
     public function admin(): AdminClient
