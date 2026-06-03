@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Okta\Connect\WhatsApp;
 
+use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 use Okta\Connect\WhatsApp\Resources\Channels;
@@ -27,6 +28,8 @@ use Psr\Http\Client\ClientInterface;
 final class Client
 {
     private readonly HttpClientInterface $http;
+
+    private readonly string $baseUrl;
 
     private ?Messages $messages = null;
     private ?Conversations $conversations = null;
@@ -54,10 +57,11 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.5',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.6',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);
+        $this->baseUrl = $baseUrl;
     }
 
     /**
@@ -144,5 +148,22 @@ final class Client
     public function admin(): AdminClient
     {
         return $this->admin ??= new AdminClient($this->http);
+    }
+
+    /**
+     * Embed integration surface — mint SSO / cookieless tokens and build
+     * iframe URLs for the embedded inbox. Fetch the shared secret once
+     * via `admin()->embedSecret()->sync()` (or `provision(...)`), then:
+     *
+     *   $embed = $client->embed($secret);
+     *   $url   = $embed->inboxUrl(new EmbedUser('u-1', 'op@acme.com', 'Op'));
+     *
+     * The Client's configured base URL is reused, so callers never
+     * re-type the platform host. Override `issuer`/`audience` only when a
+     * provisioned per-partner secret uses a non-default issuer.
+     */
+    public function embed(string $sharedSecret, string $issuer = 'okta-web', string $audience = 'okta-whatsapp'): Embed
+    {
+        return new Embed($this->baseUrl, $sharedSecret, $issuer, $audience);
     }
 }

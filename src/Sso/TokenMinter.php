@@ -21,6 +21,13 @@ use InvalidArgumentException;
  * expects on the platform side: `iss`, `aud`, `sub`, `email`, `name`,
  * `scope`, `jti`, `iat`, `exp`. Default `iss=okta-web`, `aud=okta-whatsapp`
  * — override only if the platform deployment uses different values.
+ *
+ * @deprecated since 0.6 — use {@see \Okta\Connect\WhatsApp\Embed\Embed}
+ *             (via `Client::embed()`), which covers BOTH the one-shot SSO
+ *             handshake and the long-lived cookieless per-request flow,
+ *             plus validated `ui_hide` keys and iframe-URL/header helpers.
+ *             This class only mints the ≤300 s one-shot SSO token and is
+ *             kept for backward compatibility.
  */
 final class TokenMinter
 {

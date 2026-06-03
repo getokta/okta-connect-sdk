@@ -103,6 +103,33 @@ $partner      = $client->admin()->embedSecret()->provision('salla', 'salla-app')
 // $partner = ['label' => 'salla', 'issuer' => 'salla-app', 'secret' => '…', 'created' => true]
 ```
 
+### Embedding the inbox (iframe)
+
+Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Fetch the
+shared secret once (`admin()->embedSecret()->sync()` or `provision()`), then:
+
+```php
+use Okta\Connect\WhatsApp\Embed\EmbedUser;
+use Okta\Connect\WhatsApp\Embed\UiHide;
+
+$embed = $client->embed($sharedSecret);              // base URL reused from the client
+$operator = new EmbedUser(sub: 'partner-user-7', email: 'op@acme.com', name: 'Op');
+
+// Cookieless per-request flow (survives third-party-cookie blocking). The token
+// rides every request inside the iframe — recommended for white-label embeds.
+$src = $embed->inboxUrl($operator, uiHide: [UiHide::AI, UiHide::ASSIGN_AGENT]);
+// <iframe src="<?= $src ?>"></iframe>
+
+// …or attach the header to your own XHR/fetch calls instead of the query string:
+$headers = $embed->tokenHeader($embed->sessionToken($operator));
+
+// One-shot SSO landing handshake (same-site cookies):
+$ssoUrl = $embed->ssoUrl($operator, redirectPath: '/app/inbox?embedded=1');
+```
+
+Unknown `ui_hide` keys and out-of-range TTLs throw at mint time, so misconfigured
+embeds fail loudly here instead of silently in the browser.
+
 ### Idempotency
 
 Mutating calls accept an optional `Idempotency-Key` header so safe retries are server-deduped:
