@@ -13,6 +13,7 @@ use Okta\Connect\WhatsApp\Resources\Groups;
 use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
 use Okta\Connect\WhatsApp\Resources\Messages;
+use Okta\Connect\WhatsApp\Resources\Templates;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
 
@@ -32,6 +33,7 @@ final class Client
     private ?Contacts $contacts = null;
     private ?Channels $channels = null;
     private ?Webhooks $webhooks = null;
+    private ?Templates $templates = null;
     private ?Meta $meta = null;
     private ?QrPairing $qr = null;
     private ?Groups $groups = null;
@@ -52,7 +54,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.4',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.5',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);
@@ -101,6 +103,15 @@ final class Client
     public function webhooks(): Webhooks
     {
         return $this->webhooks ??= new Webhooks($this->http);
+    }
+
+    /**
+     * Meta message templates — list the catalogue + send an approved
+     * template to a wa_id.
+     */
+    public function templates(): Templates
+    {
+        return $this->templates ??= new Templates($this->http);
     }
 
     /**

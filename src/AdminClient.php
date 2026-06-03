@@ -6,6 +6,7 @@ namespace Okta\Connect\WhatsApp;
 
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 use Okta\Connect\WhatsApp\Resources\Admin\EmbedSecret;
+use Okta\Connect\WhatsApp\Resources\Admin\Messages;
 use Okta\Connect\WhatsApp\Resources\Admin\Organizations;
 use Okta\Connect\WhatsApp\Resources\Admin\WorkspaceChannels;
 use Okta\Connect\WhatsApp\Resources\Admin\WorkspaceTokens;
@@ -26,6 +27,7 @@ final class AdminClient
     private ?WorkspaceTokens $workspaceTokens = null;
     private ?WorkspaceChannels $workspaceChannels = null;
     private ?EmbedSecret $embedSecret = null;
+    private ?Messages $messages = null;
 
     public function __construct(private readonly HttpClientInterface $http)
     {
@@ -65,5 +67,14 @@ final class AdminClient
     public function embedSecret(): EmbedSecret
     {
         return $this->embedSecret ??= new EmbedSecret($this->http);
+    }
+
+    /**
+     * Platform-workspace transactional + OTP messaging (outbound-only,
+     * never fans out to the agent inbox).
+     */
+    public function messages(): Messages
+    {
+        return $this->messages ??= new Messages($this->http);
     }
 }

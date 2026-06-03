@@ -5,6 +5,35 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-06-03
+
+### Added
+- `Client::templates()` — Meta message templates.
+  - `list($filters)` → `list<Template>`; optional `status` / `language` filters
+    (`GET /api/v1/templates`).
+  - `send($payload)` queues an approved template to a `wa_id` with positional
+    `variables` and returns the resulting `Message` (`POST /api/v1/templates/send`).
+- `Client::groups()` — WhatsApp groups (Baileys-only): list/get + create/rename
+  + add/remove participants + set picture + force resync. *(Shipped in code in
+  0.4.x; first formally released and tagged here.)*
+- `AdminClient::messages()` — platform-workspace transactional messaging
+  (outbound-only, never fans out to the agent inbox; needs `platform.admin`
+  or `platform.inbox`).
+  - `transactional($payload)` — one-shot `text` or Cloud API `template`
+    (`POST /api/v1/admin/messages/transactional`).
+  - `otp($payload)` — one-time password over WhatsApp, server-throttled per
+    destination phone (`POST /api/v1/admin/messages/otp`).
+- `AdminClient::embedSecret()->provision($label, $issuer)` — provision a
+  labelled per-partner embed-SSO secret bound to a specific JWT issuer in one
+  round-trip (`POST /api/v1/admin/embed-secret/provision`). Complements the
+  legacy `sync()` (which always returns the `iss=okta-web` secret).
+
+### New DTOs
+- `Template`, `TransactionalMessage`.
+
+### Changed
+- User-Agent bumped to `okta-connect-sdk-php/0.5`.
+
 ## [0.4.0] — 2026-05-11
 
 ### Added

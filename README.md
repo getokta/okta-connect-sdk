@@ -42,6 +42,20 @@ $contacts      = $client->contacts()->list(['search' => '+966']);
 $client->contacts()->upsert(['phone' => '+9665...', 'name' => 'Ali']);
 $channels      = $client->channels()->list();
 $client->webhooks()->register(['url' => 'https://...', 'events' => ['message.received']]);
+
+// Meta message templates
+$templates = $client->templates()->list(['status' => 'APPROVED', 'language' => 'ar']);
+$client->templates()->send([
+    'channel_id'    => '01H...',
+    'wa_id'         => '966500000000',
+    'template_name' => 'order_ready',
+    'language'      => 'ar',
+    'variables'     => ['12345', '120 SAR'],
+]);
+
+// WhatsApp groups (Baileys-only)
+$group = $client->groups()->create('Sales pod', ['966500000000', '966500000001']);
+$client->groups()->addParticipants($group->id, ['966500000002']);
 ```
 
 ### Platform-admin scope (`platform.admin` ability)
@@ -68,6 +82,25 @@ $client->admin()->workspaceChannels()->create($workspaceId, [
     'type'         => 'whatsapp_cloud',
 ]);
 $client->admin()->workspaceChannels()->list($workspaceId);
+
+// Platform transactional messaging (outbound-only; needs platform.admin or platform.inbox)
+$client->admin()->messages()->transactional([
+    'to'   => '+966500000000',
+    'type' => 'text',
+    'text' => 'Your order #1234 has shipped.',
+]);
+$client->admin()->messages()->otp([
+    'to'          => '+966500000000',
+    'code'        => '482915',
+    'ttl_seconds' => 300,
+    'purpose'     => 'two_factor',
+    'locale'      => 'ar',
+]);
+
+// Embed-SSO secrets
+$legacySecret = $client->admin()->embedSecret()->sync();              // iss=okta-web
+$partner      = $client->admin()->embedSecret()->provision('salla', 'salla-app');
+// $partner = ['label' => 'salla', 'issuer' => 'salla-app', 'secret' => '…', 'created' => true]
 ```
 
 ### Idempotency
