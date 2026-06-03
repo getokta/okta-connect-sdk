@@ -42,6 +42,20 @@ $contacts      = $client->contacts()->list(['search' => '+966']);
 $client->contacts()->upsert(['phone' => '+9665...', 'name' => 'Ali']);
 $channels      = $client->channels()->list();
 $client->webhooks()->register(['url' => 'https://...', 'events' => ['message.received']]);
+
+// Meta message templates
+$templates = $client->templates()->list(['status' => 'APPROVED', 'language' => 'ar']);
+$client->templates()->send([
+    'channel_id'    => '01H...',
+    'wa_id'         => '966500000000',
+    'template_name' => 'order_ready',
+    'language'      => 'ar',
+    'variables'     => ['12345', '120 SAR'],
+]);
+
+// WhatsApp groups (Baileys-only)
+$group = $client->groups()->create('Sales pod', ['966500000000', '966500000001']);
+$client->groups()->addParticipants($group->id, ['966500000002']);
 ```
 
 ### Platform-admin scope (`platform.admin` ability)
@@ -68,7 +82,53 @@ $client->admin()->workspaceChannels()->create($workspaceId, [
     'type'         => 'whatsapp_cloud',
 ]);
 $client->admin()->workspaceChannels()->list($workspaceId);
+
+// Platform transactional messaging (outbound-only; needs platform.admin or platform.inbox)
+$client->admin()->messages()->transactional([
+    'to'   => '+966500000000',
+    'type' => 'text',
+    'text' => 'Your order #1234 has shipped.',
+]);
+$client->admin()->messages()->otp([
+    'to'          => '+966500000000',
+    'code'        => '482915',
+    'ttl_seconds' => 300,
+    'purpose'     => 'two_factor',
+    'locale'      => 'ar',
+]);
+
+// Embed-SSO secrets
+$legacySecret = $client->admin()->embedSecret()->sync();              // iss=okta-web
+$partner      = $client->admin()->embedSecret()->provision('salla', 'salla-app');
+// $partner = ['label' => 'salla', 'issuer' => 'salla-app', 'secret' => '…', 'created' => true]
 ```
+
+### Embedding the inbox (iframe)
+
+Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Fetch the
+shared secret once (`admin()->embedSecret()->sync()` or `provision()`), then:
+
+```php
+use Okta\Connect\WhatsApp\Embed\EmbedUser;
+use Okta\Connect\WhatsApp\Embed\UiHide;
+
+$embed = $client->embed($sharedSecret);              // base URL reused from the client
+$operator = new EmbedUser(sub: 'partner-user-7', email: 'op@acme.com', name: 'Op');
+
+// Cookieless per-request flow (survives third-party-cookie blocking). The token
+// rides every request inside the iframe — recommended for white-label embeds.
+$src = $embed->inboxUrl($operator, uiHide: [UiHide::AI, UiHide::ASSIGN_AGENT]);
+// <iframe src="<?= $src ?>"></iframe>
+
+// …or attach the header to your own XHR/fetch calls instead of the query string:
+$headers = $embed->tokenHeader($embed->sessionToken($operator));
+
+// One-shot SSO landing handshake (same-site cookies):
+$ssoUrl = $embed->ssoUrl($operator, redirectPath: '/app/inbox?embedded=1');
+```
+
+Unknown `ui_hide` keys and out-of-range TTLs throw at mint time, so misconfigured
+embeds fail loudly here instead of silently in the browser.
 
 ### Idempotency
 

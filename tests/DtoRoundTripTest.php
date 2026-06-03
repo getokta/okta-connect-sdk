@@ -9,6 +9,8 @@ use Okta\Connect\WhatsApp\DTO\Contact;
 use Okta\Connect\WhatsApp\DTO\Conversation;
 use Okta\Connect\WhatsApp\DTO\Message;
 use Okta\Connect\WhatsApp\DTO\PaginatedResult;
+use Okta\Connect\WhatsApp\DTO\Template;
+use Okta\Connect\WhatsApp\DTO\TransactionalMessage;
 use Okta\Connect\WhatsApp\DTO\Workspace;
 use Okta\Connect\WhatsApp\DTO\WorkspaceToken;
 use Okta\Connect\WhatsApp\DTO\WorkspaceUser;
@@ -89,6 +91,38 @@ final class DtoRoundTripTest extends TestCase
 
         $this->assertSame(['read', 'send'], $out['abilities']);
         $this->assertSame('abc.def', $out['plain_text_token']);
+    }
+
+    public function test_template_round_trip(): void
+    {
+        $payload = [
+            'id' => 't_1',
+            'name' => 'order_ready',
+            'language' => 'ar',
+            'category' => 'UTILITY',
+            'status' => 'APPROVED',
+            'header_type' => 'TEXT',
+            'header_text' => 'Order update',
+            'body_text' => 'Your order {{1}} is ready.',
+            'footer_text' => 'Okta',
+            'buttons' => [['type' => 'QUICK_REPLY', 'text' => 'Track']],
+            'created_at' => '2026-01-01T00:00:00Z',
+        ];
+
+        $this->assertSame($payload, Template::fromArray($payload)->toArray());
+    }
+
+    public function test_transactional_message_round_trip(): void
+    {
+        $payload = [
+            'id' => 'msg_01H',
+            'status' => 'queued',
+            'to' => '+966500000000',
+            'channel_id' => '01HCHAN',
+            'created_at' => '2026-06-03T00:00:00+00:00',
+        ];
+
+        $this->assertSame($payload, TransactionalMessage::fromArray($payload)->toArray());
     }
 
     public function test_paginated_result_iterates_and_reports_cursor(): void
