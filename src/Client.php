@@ -40,7 +40,6 @@ final class Client
     private ?Meta $meta = null;
     private ?QrPairing $qr = null;
     private ?Groups $groups = null;
-    private ?AdminClient $admin = null;
 
     /**
      * @param  array{timeout?: int, retries?: int, httpClient?: ClientInterface, userAgent?: string}  $options
@@ -145,15 +144,12 @@ final class Client
         return $this->groups ??= new Groups($this->http);
     }
 
-    public function admin(): AdminClient
-    {
-        return $this->admin ??= new AdminClient($this->http);
-    }
-
     /**
      * Embed integration surface — mint SSO / cookieless tokens and build
-     * iframe URLs for the embedded inbox. Fetch the shared secret once
-     * via `admin()->embedSecret()->sync()` (or `provision(...)`), then:
+     * iframe URLs for the embedded inbox. Obtain the shared secret from
+     * your platform operator (provisioned server-side under `embed.*`
+     * settings — the privileged admin surface is not shipped in this SDK),
+     * then:
      *
      *   $embed = $client->embed($secret);
      *   $url   = $embed->inboxUrl(new EmbedUser('u-1', 'op@acme.com', 'Op'));

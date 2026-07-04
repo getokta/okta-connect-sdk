@@ -58,55 +58,17 @@ $group = $client->groups()->create('Sales pod', ['966500000000', '966500000001']
 $client->groups()->addParticipants($group->id, ['966500000002']);
 ```
 
-### Platform-admin scope (`platform.admin` ability)
-
-```php
-$client->admin()->workspaces()->create(['name' => 'Acme', 'slug' => 'acme']);
-$client->admin()->workspaces()->list(['per_page' => 20]);
-$client->admin()->workspaces()->get($ulid);
-$client->admin()->workspaces()->update($ulid, ['display_name' => 'Acme Inc']);
-
-$client->admin()->workspaceUsers()->create($workspaceId, [
-    'name' => 'Ali', 'email' => 'ali@acme.com', 'password_auto' => true,
-]);
-$client->admin()->workspaceUsers()->list($workspaceId);
-
-$client->admin()->workspaceTokens()->issue($workspaceId, [
-    'name' => 'partner-app',
-    'abilities' => ['read', 'send'],
-    'user_id' => $userId,
-]);
-
-$client->admin()->workspaceChannels()->create($workspaceId, [
-    'display_name' => 'Acme Main',
-    'type'         => 'whatsapp_cloud',
-]);
-$client->admin()->workspaceChannels()->list($workspaceId);
-
-// Platform transactional messaging (outbound-only; needs platform.admin or platform.inbox)
-$client->admin()->messages()->transactional([
-    'to'   => '+966500000000',
-    'type' => 'text',
-    'text' => 'Your order #1234 has shipped.',
-]);
-$client->admin()->messages()->otp([
-    'to'          => '+966500000000',
-    'code'        => '482915',
-    'ttl_seconds' => 300,
-    'purpose'     => 'two_factor',
-    'locale'      => 'ar',
-]);
-
-// Embed-SSO secrets
-$legacySecret = $client->admin()->embedSecret()->sync();              // iss=okta-web
-$partner      = $client->admin()->embedSecret()->provision('salla', 'salla-app');
-// $partner = ['label' => 'salla', 'issuer' => 'salla-app', 'secret' => '…', 'created' => true]
-```
+> **Platform-admin surface is not shipped in this public SDK.** Privileged
+> `platform.admin` operations (workspace/organization provisioning, token
+> minting, embed-secret provisioning) are performed server-side by the
+> platform operator and are intentionally excluded from this developer SDK
+> to keep the public attack surface minimal. Call those endpoints directly
+> from a trusted backend if you operate the platform.
 
 ### Embedding the inbox (iframe)
 
-Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Fetch the
-shared secret once (`admin()->embedSecret()->sync()` or `provision()`), then:
+Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Obtain the
+shared secret from your platform operator (provisioned server-side), then:
 
 ```php
 use Okta\Connect\WhatsApp\Embed\EmbedUser;
