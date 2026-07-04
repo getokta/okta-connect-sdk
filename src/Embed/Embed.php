@@ -11,10 +11,10 @@ use InvalidArgumentException;
  * Okta Connect inbox in an iframe. No HTTP — pure, dependency-free
  * HS256 crypto + URL assembly.
  *
- * Construct it with the shared secret you fetched once via
- * `AdminClient::embedSecret()->sync()` (legacy `iss=okta-web`) or
- * `provision($label, $issuer)` (per-partner). Or, with an API client
- * already in hand, `$client->embed($secret)` fills in the base URL.
+ * Construct it with the shared secret provisioned server-side by your
+ * platform operator (under the `embed.*` settings; legacy `iss=okta-web`,
+ * or a per-partner issuer). Or, with an API client already in hand,
+ * `$client->embed($secret)` fills in the base URL.
  *
  * Two flows — pick by how the iframe re-proves identity:
  *

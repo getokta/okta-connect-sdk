@@ -5,6 +5,22 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-07-04
+
+### Removed (security hardening) — BREAKING
+- **Dropped the entire platform-admin surface from the public SDK.** Removed
+  `AdminClient` (`Client::admin()`), all `Resources\Admin\*` (Workspaces,
+  Organizations, WorkspaceUsers, WorkspaceTokens, WorkspaceChannels,
+  EmbedSecret, admin Messages) and the admin-only `ProvisionedOrganization`
+  DTO. These wrapped privileged `platform.admin` endpoints (org/workspace
+  provisioning, API-token minting, embed-secret provisioning) and should not
+  ship in a public developer package — publishing them needlessly documented
+  the privileged attack surface. The server-side endpoints are unchanged and
+  remain callable directly from a trusted backend by the platform operator.
+- The developer-facing surface (messages, conversations, contacts, channels,
+  templates, groups, webhooks, Meta/QR integrations, embed token minting) is
+  unchanged.
+
 ## [0.6.0] — 2026-06-03
 
 ### Added

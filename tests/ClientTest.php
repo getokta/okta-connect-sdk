@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Okta\Connect\WhatsApp\Tests;
 
-use Okta\Connect\WhatsApp\AdminClient;
 use Okta\Connect\WhatsApp\Client;
 use Okta\Connect\WhatsApp\Config;
 use Okta\Connect\WhatsApp\Resources\Channels;
@@ -29,8 +28,6 @@ final class ClientTest extends TestCase
         $this->assertInstanceOf(Contacts::class, $client->contacts());
         $this->assertInstanceOf(Channels::class, $client->channels());
         $this->assertInstanceOf(Webhooks::class, $client->webhooks());
-        $this->assertInstanceOf(AdminClient::class, $client->admin());
-        $this->assertSame($client->admin(), $client->admin());
     }
 
     public function test_config_trims_trailing_slash(): void

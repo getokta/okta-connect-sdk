@@ -10,7 +10,7 @@ use InvalidArgumentException;
  * Mints HS256 JWTs accepted by the platform's `/embed/sso` route.
  *
  * Pure cryptography — no HTTP. Construct with the shared secret
- * returned by `AdminClient::embedSecret()->sync()` (or rotated
+ * provisioned server-side by your platform operator (or rotated
  * manually), then either:
  *
  *   - `mint()` to get the bare JWT string, or
