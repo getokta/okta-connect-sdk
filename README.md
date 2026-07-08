@@ -28,11 +28,17 @@ $client = new Client(
     options: ['timeout' => 30, 'retries' => 2],
 );
 
+// Typed helpers build the correct request shape for you:
+$client->messages()->sendText('01H...channel', '966500000000', 'Hello');
+$client->messages()->sendMedia('01H...channel', '966500000000', 'image', 'https://cdn.example.com/a.jpg', 'Look!');
+$client->messages()->reply('01H...conversation', 'Thanks!');
+
+// Or send a raw payload (flat shape: channel_id + wa_id + body, or conversation_id + body):
 $client->messages()->send([
     'channel_id' => '01H...',
-    'to'         => '+9665...',
+    'wa_id'      => '966500000000',
     'type'       => 'text',
-    'text'       => ['body' => 'Hello'],
+    'body'       => 'Hello',
 ]);
 
 $messages      = $client->messages()->list(['conversation_id' => '01H...', 'per_page' => 50]);

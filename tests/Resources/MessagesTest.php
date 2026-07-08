@@ -20,7 +20,7 @@ final class MessagesTest extends TestCase
                 'data' => [
                     'id' => 'msg_1',
                     'channel_id' => 'ch_1',
-                    'to' => '+9665',
+                    'conversation_id' => 'conv_1',
                     'type' => 'text',
                     'status' => 'queued',
                     'body' => 'Hello',
@@ -28,11 +28,12 @@ final class MessagesTest extends TestCase
             ]),
         ], $history);
 
+        // The server expects the flat shape: channel_id + wa_id + body.
         $message = $client->messages()->send([
             'channel_id' => 'ch_1',
-            'to' => '+9665',
+            'wa_id' => '966500000000',
             'type' => 'text',
-            'text' => ['body' => 'Hello'],
+            'body' => 'Hello',
         ], idempotencyKey: 'op-1');
 
         $this->assertInstanceOf(Message::class, $message);
@@ -44,6 +45,61 @@ final class MessagesTest extends TestCase
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame('/api/v1/messages', $request->getUri()->getPath());
         $this->assertSame('op-1', $request->getHeaderLine('Idempotency-Key'));
+    }
+
+    public function test_send_text_builds_the_flat_server_payload(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 'msg_1', 'type' => 'text', 'status' => 'queued']]),
+        ], $history);
+
+        $client->messages()->sendText('ch_1', '966500000000', 'Your order is on the way!', idempotencyKey: 'ord-1');
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+
+        $this->assertSame('ch_1', $body['channel_id']);
+        $this->assertSame('966500000000', $body['wa_id']);
+        $this->assertSame('text', $body['type']);
+        $this->assertSame('Your order is on the way!', $body['body']);
+        // Must NOT emit the WhatsApp-Cloud-style keys the server rejects.
+        $this->assertArrayNotHasKey('to', $body);
+        $this->assertArrayNotHasKey('text', $body);
+        $this->assertSame('ord-1', $history[0]['request']->getHeaderLine('Idempotency-Key'));
+    }
+
+    public function test_send_media_builds_the_media_payload(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 'msg_2', 'type' => 'image', 'status' => 'queued']]),
+        ], $history);
+
+        $client->messages()->sendMedia('ch_1', '966500000000', 'image', 'https://cdn.example.com/a.jpg', 'Look!');
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+
+        $this->assertSame('image', $body['type']);
+        $this->assertSame('https://cdn.example.com/a.jpg', $body['media_url']);
+        $this->assertSame('Look!', $body['body']);
+        $this->assertSame('966500000000', $body['wa_id']);
+    }
+
+    public function test_reply_targets_an_existing_conversation(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 'msg_3', 'type' => 'text', 'status' => 'queued']]),
+        ], $history);
+
+        $client->messages()->reply('conv_1', 'Thanks!');
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+
+        $this->assertSame('conv_1', $body['conversation_id']);
+        $this->assertSame('text', $body['type']);
+        $this->assertSame('Thanks!', $body['body']);
+        $this->assertArrayNotHasKey('channel_id', $body);
     }
 
     public function test_list_with_conversation_id_uses_nested_route(): void
