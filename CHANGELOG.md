@@ -5,7 +5,22 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.7.0] — 2026-07-04
+## [0.7.0] — 2026-07-08
+
+### Fixed
+- **`messages()` send payload shape.** The documented `Messages::send()` example
+  posted a WhatsApp-Cloud-style body (`to` + `text.body`), but the platform's
+  `POST /api/v1/messages` validates a FLAT shape (`channel_id` + `wa_id`, or
+  `conversation_id`, plus a flat `body`) — so following the README produced a
+  422 and no message was sent. The raw `send()` and the README now use the
+  correct flat shape.
+
+### Added
+- **Typed send helpers** on `messages()` that always build the correct request
+  shape, so callers can't get it wrong:
+  - `sendText(string $channelId, string $waId, string $body, ?string $idempotencyKey = null)`
+  - `sendMedia(string $channelId, string $waId, string $type, string $mediaUrl, string $caption = '', ?string $idempotencyKey = null)`
+  - `reply(string $conversationId, string $body, ?string $idempotencyKey = null)`
 
 ### Removed (security hardening) — BREAKING
 - **Dropped the entire platform-admin surface from the public SDK.** Removed
