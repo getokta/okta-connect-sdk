@@ -5,6 +5,46 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-07-09
+
+### Added
+- **Email — `Client::emails()`.** Full transactional + bulk email surface, the
+  new headline of this release.
+  - `send($payload, ?idempotencyKey)` → `EmailMessage` (`POST /api/v1/emails`):
+    send as one of your verified sending domains (`from`, `to[]`, `subject`,
+    `html`/`text`, `cc`/`bcc`, `reply_to`, `headers`). DKIM-signed server-side.
+  - `sendTemplate($from, $to, $template, $variables, $overrides, ?idempotencyKey)`
+    — render a stored template by slug/ULID with a `variables` map.
+  - `list($filters)` → `PaginatedResult<EmailMessage>` (send log, `status` filter);
+    `get($ulid)` → `EmailMessage`.
+  - `analytics($from, $to)` → `EmailAnalytics` — status-count summary
+    (delivery/bounce rates) + a per-day series (`GET /api/v1/emails/analytics`).
+  - Nested managers:
+    - `emails()->templates()` — `list`/`get`/`create`/`update`/`delete`
+      (`/api/v1/email-templates`).
+    - `emails()->broadcasts()` — `list`/`get`/`create` a draft + `queue($ulid)`
+      to fan out to a CRM-tag audience (`/api/v1/emails/broadcasts`).
+    - `emails()->suppressions()` — `list`/`add($address)`/`remove($idOrAddress)`
+      for the org suppression list (`/api/v1/emails/suppressions`).
+- **Social publishing — `Client::socialPosts()`.** Compose a post and fan it out
+  to one or more social channels (Telegram, X, Instagram, …).
+  - `schedule($text, $channelIds, $scheduledAt, $media)` / `draft($text, $channelIds, $media)`
+    typed helpers, plus raw `create($payload)`, `list($filters)`, `get($ulid)`
+    (`/api/v1/social-posts`).
+  - `SocialPost` carries per-channel `targets` (`SocialPostTarget`: status,
+    permalink, provider_post_id) so you can read each platform's outcome —
+    including the upstream failure reason on a partially-failed fan-out.
+- **Campaigns — `Client::campaigns()`.** Broadcast (bulk/drip) message campaigns:
+  `list`/`get`/`create` a draft + `queue($ulid)` to materialise the audience and
+  start sending (`/api/v1/campaigns`).
+
+### New DTOs
+- `EmailMessage`, `EmailTemplate`, `EmailBroadcast`, `EmailSuppression`,
+  `EmailAnalytics`, `SocialPost`, `SocialPostTarget`, `Campaign`.
+
+### Changed
+- User-Agent bumped to `okta-connect-sdk-php/0.8`.
+
 ## [0.7.0] — 2026-07-08
 
 ### Fixed

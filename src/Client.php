@@ -7,13 +7,16 @@ namespace Okta\Connect\WhatsApp;
 use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
+use Okta\Connect\WhatsApp\Resources\Campaigns;
 use Okta\Connect\WhatsApp\Resources\Channels;
 use Okta\Connect\WhatsApp\Resources\Contacts;
 use Okta\Connect\WhatsApp\Resources\Conversations;
+use Okta\Connect\WhatsApp\Resources\Emails;
 use Okta\Connect\WhatsApp\Resources\Groups;
 use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
 use Okta\Connect\WhatsApp\Resources\Messages;
+use Okta\Connect\WhatsApp\Resources\SocialPosts;
 use Okta\Connect\WhatsApp\Resources\Templates;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
@@ -40,6 +43,9 @@ final class Client
     private ?Meta $meta = null;
     private ?QrPairing $qr = null;
     private ?Groups $groups = null;
+    private ?Emails $emails = null;
+    private ?SocialPosts $socialPosts = null;
+    private ?Campaigns $campaigns = null;
 
     /**
      * @param  array{timeout?: int, retries?: int, httpClient?: ClientInterface, userAgent?: string}  $options
@@ -56,7 +62,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.6',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.8',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);
@@ -142,6 +148,39 @@ final class Client
     public function groups(): Groups
     {
         return $this->groups ??= new Groups($this->http);
+    }
+
+    /**
+     * Transactional + bulk email — send a message as one of your verified
+     * sending domains, read the send log, and manage templates, broadcasts
+     * and the suppression list via nested accessors:
+     *
+     *   $client->emails()->send([...]);
+     *   $client->emails()->templates()->create([...]);
+     *   $client->emails()->broadcasts()->queue($ulid);
+     *   $client->emails()->suppressions()->add('bounced@example.com');
+     */
+    public function emails(): Emails
+    {
+        return $this->emails ??= new Emails($this->http);
+    }
+
+    /**
+     * Social publishing — compose a post and fan it out to one or more social
+     * channels (Telegram, X, Instagram, …). Schedule for later or draft now.
+     */
+    public function socialPosts(): SocialPosts
+    {
+        return $this->socialPosts ??= new SocialPosts($this->http);
+    }
+
+    /**
+     * Broadcast messaging campaigns — create a draft, then queue it to
+     * materialise its audience and start sending.
+     */
+    public function campaigns(): Campaigns
+    {
+        return $this->campaigns ??= new Campaigns($this->http);
     }
 
     /**

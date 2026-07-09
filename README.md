@@ -4,9 +4,10 @@
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Status](https://img.shields.io/badge/status-alpha-orange)](#)
 
-A framework-agnostic PHP client for the **Okta Connect** omnichannel messaging platform.
-WhatsApp ships first; SMS and email channels follow under the same client surface
-(`Okta\Connect\<Channel>\*`). No Laravel dependency in the SDK code itself — a separate
+A framework-agnostic PHP client for the **Okta Connect** omnichannel platform:
+WhatsApp messaging, **transactional + bulk email**, **social publishing**
+(Telegram / X / Instagram / …) and **broadcast campaigns** — all under one client
+surface. No Laravel dependency in the SDK code itself — a separate
 `getokta/okta-connect-sdk-laravel` bridge package will be published later.
 
 ## Installation
@@ -62,6 +63,104 @@ $client->templates()->send([
 // WhatsApp groups (Baileys-only)
 $group = $client->groups()->create('Sales pod', ['966500000000', '966500000001']);
 $client->groups()->addParticipants($group->id, ['966500000002']);
+```
+
+### Email
+
+Send transactional email (receipts, OTPs, notifications) as one of your **verified
+sending domains** — DKIM-signed server-side — read the send log, and manage
+templates, broadcasts and the suppression list. Needs the `send` ability to send.
+
+```php
+// Send an email
+$email = $client->emails()->send([
+    'from'    => 'Acme <hello@mail.acme.com>',   // bare address also accepted
+    'to'      => ['ali@example.com'],
+    'subject' => 'Your receipt',
+    'html'    => '<h1>Thanks!</h1>',
+    'text'    => 'Thanks!',                       // at least one of html/text/template
+], idempotencyKey: 'order-1042-receipt');
+
+echo $email->status;   // queued | sent | delivered | bounced | complained | failed
+
+// …or render a stored template with variables
+$client->emails()->sendTemplate(
+    from: 'Acme <hello@mail.acme.com>',
+    to: ['ali@example.com'],
+    template: 'order-receipt',                    // slug or ULID
+    variables: ['order_id' => '1042'],
+);
+
+// Send log + a single message
+$sent = $client->emails()->list(['status' => 'delivered', 'per_page' => 50]);
+$one  = $client->emails()->get('01H...');
+
+// Delivery analytics (defaults to the last 30 days)
+$stats = $client->emails()->analytics(from: '2026-06-01', to: '2026-06-30');
+echo $stats->summary['delivery_rate'];
+
+// Reusable templates
+$tpl = $client->emails()->templates()->create([
+    'name'    => 'Order receipt',
+    'subject' => 'Your order {{ order_id }} is confirmed',
+    'html'    => '<p>Hi {{ name }}, order {{ order_id }} is on the way.</p>',
+]);
+$client->emails()->templates()->update($tpl->id, ['subject' => 'Order {{ order_id }} shipped']);
+
+// Bulk broadcasts to a CRM-tag audience
+$bc = $client->emails()->broadcasts()->create([
+    'name'     => 'July newsletter',
+    'from'     => 'Acme <hello@mail.acme.com>',
+    'subject'  => "What's new in July",
+    'html'     => '<h1>Hello!</h1>',
+    'audience' => ['tag_slugs' => ['newsletter']],   // omit ⇒ everyone with an email
+]);
+$client->emails()->broadcasts()->queue($bc->id);      // fan out one send per recipient
+
+// Suppression list (bounces/complaints are added automatically; you can add manually)
+$client->emails()->suppressions()->add('bounced@example.com');
+$client->emails()->suppressions()->remove('bounced@example.com');
+```
+
+> **Bring your own SMTP.** A domain connected via your own SMTP/provider
+> (SES / Postmark / Resend) is usable immediately — no DNS verification needed;
+> your server authenticates the mail. Platform-managed domains still publish
+> SPF/DKIM/DMARC first.
+
+### Social publishing
+
+Compose a post once and fan it out to one or more social channels. With a future
+`scheduledAt` the post is scheduled; without one it's a draft.
+
+```php
+$post = $client->socialPosts()->schedule(
+    text: 'New drop is live! 🎉',
+    channelIds: ['01H...x', '01H...telegram'],
+    scheduledAt: '2026-07-20T09:00:00+00:00',
+    media: [['url' => 'https://cdn.example.com/promo.jpg', 'type' => 'image']],
+);
+
+$client->socialPosts()->draft('Behind the scenes…', ['01H...instagram']);
+
+// Read each platform's outcome — including the upstream failure reason
+foreach ($client->socialPosts()->get($post->id)->targets as $t) {
+    echo "{$t->status} → {$t->permalink}\n";
+}
+```
+
+### Campaigns
+
+Broadcast (bulk / drip) message campaigns: create a draft, then queue it to
+materialise the audience and start sending.
+
+```php
+$campaign = $client->campaigns()->create([
+    'name'            => 'Ramadan promo',
+    'channel_id'      => '01H...channel',
+    'template_id'     => '01H...template',
+    'audience_filter' => ['tag_slugs' => ['vip']],
+]);
+$client->campaigns()->queue($campaign->id);
 ```
 
 > **Platform-admin surface is not shipped in this public SDK.** Privileged
