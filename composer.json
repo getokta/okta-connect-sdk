@@ -1,9 +1,9 @@
 {
     "name": "getokta/okta-connect-sdk",
-    "description": "Official PHP SDK for Okta Connect — the omnichannel messaging platform (WhatsApp first; SMS / Email to follow).",
+    "description": "Official PHP SDK for Okta Connect — the omnichannel messaging platform (WhatsApp, email, social publishing, campaigns).",
     "type": "library",
     "license": "MIT",
-    "keywords": ["okta", "connect", "whatsapp", "sdk", "messaging", "omnichannel"],
+    "keywords": ["okta", "connect", "whatsapp", "email", "sdk", "messaging", "omnichannel", "publishing"],
     "require": {
         "php": "^8.2",
         "guzzlehttp/guzzle": "^7.8",
@@ -33,7 +33,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "0.6.x-dev"
+            "dev-main": "0.8.x-dev"
         }
     },
     "minimum-stability": "stable"
