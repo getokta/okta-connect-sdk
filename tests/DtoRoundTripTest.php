@@ -59,7 +59,7 @@ final class DtoRoundTripTest extends TestCase
 
     public function test_channel_round_trip(): void
     {
-        $payload = ['id' => 'ch_1', 'display_name' => 'Main', 'type' => 'whatsapp_cloud', 'status' => 'active', 'created_at' => 'now'];
+        $payload = ['id' => 'ch_1', 'display_name' => 'Main', 'type' => 'cloud_api', 'status' => 'active', 'created_at' => 'now'];
         $this->assertSame($payload, Channel::fromArray($payload)->toArray());
     }
 
