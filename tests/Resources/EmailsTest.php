@@ -6,6 +6,7 @@ namespace Okta\Connect\WhatsApp\Tests\Resources;
 
 use Okta\Connect\WhatsApp\DTO\EmailAnalytics;
 use Okta\Connect\WhatsApp\DTO\EmailMessage;
+use Okta\Connect\WhatsApp\Email\HtmlMessageBuilder;
 use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -49,6 +50,64 @@ final class EmailsTest extends TestCase
         $body = json_decode((string) $request->getBody(), true);
         $this->assertSame(['ali@example.com'], $body['to']);
         $this->assertSame('<b>Hi</b>', $body['html']);
+    }
+
+    public function test_send_html_normalizes_string_recipient_and_posts_body(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 'em_3', 'status' => 'queued']]),
+        ], $history);
+
+        $email = $client->emails()->sendHtml(
+            'Acme <no-reply@acme.com>',
+            'ali@example.com',
+            'Your receipt',
+            '<h1>Thanks!</h1>',
+            idempotencyKey: 'html-1',
+        );
+
+        $this->assertInstanceOf(EmailMessage::class, $email);
+        $this->assertSame('em_3', $email->id);
+
+        $request = $history[0]['request'];
+        $this->assertSame('POST', $request->getMethod());
+        $this->assertSame('/api/v1/emails', $request->getUri()->getPath());
+        $this->assertSame('html-1', $request->getHeaderLine('Idempotency-Key'));
+
+        $body = json_decode((string) $request->getBody(), true);
+        $this->assertSame('Acme <no-reply@acme.com>', $body['from']);
+        $this->assertSame(['ali@example.com'], $body['to']);
+        $this->assertSame('Your receipt', $body['subject']);
+        $this->assertSame('<h1>Thanks!</h1>', $body['html']);
+    }
+
+    public function test_send_html_accepts_a_builder_and_merges_overrides(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 'em_4', 'status' => 'queued']]),
+        ], $history);
+
+        $builder = HtmlMessageBuilder::make()
+            ->heading('أهلاً')
+            ->button('افتح الطلب', 'https://acme.com/orders/1042');
+
+        $client->emails()->sendHtml(
+            'Acme <no-reply@acme.com>',
+            ['ali@example.com', 'sara@example.com'],
+            'أهلاً بك',
+            $builder,
+            ['cc' => ['boss@example.com'], 'text' => 'أهلاً'],
+        );
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+        $this->assertSame(['ali@example.com', 'sara@example.com'], $body['to']);
+        $this->assertSame(['boss@example.com'], $body['cc']);
+        $this->assertSame('أهلاً', $body['text']);
+        $this->assertStringStartsWith('<!DOCTYPE html>', $body['html']);
+        $this->assertStringContainsString('أهلاً', $body['html']);
+        $this->assertStringContainsString('https://acme.com/orders/1042', $body['html']);
     }
 
     public function test_send_template_builds_body_with_template_and_variables_and_overrides(): void

@@ -14,6 +14,7 @@ use Okta\Connect\WhatsApp\DTO\PaginatedResult;
  * suppression list.
  *
  *   $client->emails()->send([...]);
+ *   $client->emails()->sendHtml('Acme <no-reply@acme.com>', 'a@x.com', 'Hi', $builder);
  *   $client->emails()->sendTemplate('Acme <no-reply@acme.com>', ['a@x.com'], 'welcome', ['name' => 'Ali']);
  *   $client->emails()->templates()->create([...]);
  *   $client->emails()->broadcasts()->queue($ulid);
@@ -43,6 +44,42 @@ final class Emails extends Resource
         );
 
         return EmailMessage::fromArray($this->unwrap($response->json()));
+    }
+
+    /**
+     * Convenience: send a pre-rendered HTML body to one or more
+     * recipients. A bare string `$to` is normalised to a list, and any
+     * `Stringable` — most usefully an `Email\HtmlMessageBuilder` — is
+     * cast to its markup, so a designed message sends in one call:
+     *
+     *   $client->emails()->sendHtml(
+     *       'Acme <no-reply@acme.com>',
+     *       'ali@example.com',
+     *       'Your receipt',
+     *       HtmlMessageBuilder::make()
+     *           ->heading('Thanks!')
+     *           ->button('View order', 'https://acme.com/orders/1042'),
+     *   );
+     *
+     * `$overrides` merges into the payload (cc/bcc/reply_to/text/headers).
+     *
+     * @param  list<string>|string   $to
+     * @param  array<string, mixed>  $overrides
+     */
+    public function sendHtml(
+        string $from,
+        array|string $to,
+        string $subject,
+        string|\Stringable $html,
+        array $overrides = [],
+        ?string $idempotencyKey = null,
+    ): EmailMessage {
+        return $this->send([
+            'from' => $from,
+            'to' => is_string($to) ? [$to] : $to,
+            'subject' => $subject,
+            'html' => (string) $html,
+        ] + $overrides, $idempotencyKey);
     }
 
     /**
