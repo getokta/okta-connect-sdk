@@ -15,7 +15,7 @@ final class ChannelsTest extends TestCase
         $client = ResponseFactory::makeClient([
             ResponseFactory::json(200, [
                 'data' => [
-                    ['id' => 'ch_1', 'display_name' => 'Main', 'type' => 'whatsapp_cloud'],
+                    ['id' => 'ch_1', 'display_name' => 'Main', 'type' => 'cloud_api'],
                 ],
             ]),
         ]);
@@ -23,7 +23,7 @@ final class ChannelsTest extends TestCase
         $page = $client->channels()->list();
 
         $this->assertCount(1, $page);
-        $this->assertSame(ChannelType::WhatsAppCloud, $page->items()[0]->type);
+        $this->assertSame(ChannelType::CloudApi, $page->items()[0]->type);
     }
 
     public function test_list_passes_type_and_status_filters_as_query(): void

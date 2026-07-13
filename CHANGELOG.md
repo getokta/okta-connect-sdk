@@ -5,6 +5,28 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] — 2026-07-13
+
+### Changed — BREAKING
+- **`Enums\ChannelType` is now value-identical to the platform API.** The
+  WhatsApp cases were renamed:
+  - `ChannelType::WhatsAppCloud` (`'whatsapp_cloud'`) → `ChannelType::CloudApi` (`'cloud_api'`)
+  - `ChannelType::WhatsAppBaileys` (`'whatsapp_baileys'`) → `ChannelType::Baileys` (`'baileys'`)
+
+  The old values never matched real API responses (the API serialises the
+  platform enum's raw value), so `Channel->type` silently hydrated to `null`
+  for every WhatsApp channel. Upgrade by replacing the two case references;
+  string comparisons against `'whatsapp_cloud'` / `'whatsapp_baileys'` must
+  switch to `'cloud_api'` / `'baileys'`.
+
+### Added
+- `ChannelType::Embed` (`'embed'`) and `ChannelType::Messenger`
+  (`'messenger'`) — the two platform types the enum was missing, so
+  `tryFrom()` now resolves every value the API can return.
+- `ChannelType::isWhatsApp()` — true for the family the API's
+  `type=whatsapp` filter alias expands to (`cloud_api` + `baileys`).
+- `ChannelType::isSocial()` — true for the non-WhatsApp social platforms.
+
 ## [0.9.0] — 2026-07-13
 
 ### Added
