@@ -5,6 +5,46 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] — 2026-07-13
+
+### Added
+- **HTML email designer — `Email\HtmlMessageBuilder`.** Fluent builder that
+  produces email-client-safe HTML (table-based layout, all CSS inlined,
+  600px centered card — renders in Gmail/Outlook) so callers can design
+  branded messages without writing raw markup.
+  - `make(bool $rtl = true)` — RTL-first (dir/lang + text alignment flip
+    together); pass `false` for LTR.
+  - Styling: `brandColor($hex)` (default `#10b981`), `backgroundColor($hex)`
+    (default `#f8fafc`), `logo($url, $width)`, `preheader($text)` (hidden
+    inbox preview), `footer($text)` (muted small print).
+  - Content blocks, rendered in insertion order: `heading`, `paragraph`,
+    `button($label, $url)` (bulletproof brand-colour pill), `divider`,
+    `spacer($px)`, `image($url, $alt)`, and a raw `html($block)` escape hatch.
+  - Every user-supplied string is HTML-escaped except `html()`.
+  - `toHtml()` returns the complete `<!DOCTYPE html>` document;
+    `__toString()` aliases it, so a builder drops straight into `send()`
+    payloads or `sendHtml()`.
+- **`emails()->sendHtml($from, $to, $subject, $html, $overrides, ?idempotencyKey)`**
+  — convenience for sending a pre-rendered HTML body: a bare string `$to` is
+  normalised to a list and any `Stringable` (e.g. an `HtmlMessageBuilder`)
+  is cast to its markup before delegating to `send()`.
+- **Channel type/status filtering — `channels()`.** `GET /api/v1/channels`
+  now accepts `type` (a channel type value — `cloud_api` / `baileys` /
+  `telegram` / `instagram_dm` / `twitter` / `linkedin` / `tiktok` / `email` —
+  or the family alias `whatsapp`, covering cloud_api + baileys) and `status`
+  (`connected` / `disconnected` / `pending` / `failed`); `list($filters)`
+  passes both through. Typed helpers:
+  - `listByType($type, ?$status, $extra)` — merges type/status into the
+    filters (status only when non-null).
+  - `whatsapp(?$status)` — the `whatsapp` family alias.
+  - `connected(?$type)` / `disconnected(?$type)` — status presets,
+    optionally narrowed to one type.
+- `Enums\ChannelType` gained the omnichannel cases: `Telegram`,
+  `InstagramDm`, `Twitter`, `LinkedIn`, `TikTok`, `Email`.
+
+### Changed
+- User-Agent bumped to `okta-connect-sdk-php/0.9`.
+
 ## [0.8.0] — 2026-07-09
 
 ### Added

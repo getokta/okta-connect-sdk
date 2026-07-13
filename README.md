@@ -50,6 +50,17 @@ $client->contacts()->upsert(['phone' => '+9665...', 'name' => 'Ali']);
 $channels      = $client->channels()->list();
 $client->webhooks()->register(['url' => 'https://...', 'events' => ['message.received']]);
 
+// Channels filter by platform type and connection status — `type` takes a
+// channel type value (cloud_api / baileys / telegram / instagram_dm /
+// twitter / linkedin / tiktok / email) or the family alias `whatsapp`
+// (covers cloud_api + baileys); `status` is connected / disconnected /
+// pending / failed:
+$client->channels()->list(['type' => 'telegram', 'status' => 'connected']);
+$client->channels()->listByType('tiktok', 'connected', ['per_page' => 5]);
+$client->channels()->whatsapp('connected');       // both WhatsApp flavours
+$client->channels()->connected();                 // any platform, connected
+$client->channels()->disconnected('instagram_dm');
+
 // Meta message templates
 $templates = $client->templates()->list(['status' => 'APPROVED', 'language' => 'ar']);
 $client->templates()->send([
@@ -89,6 +100,30 @@ $client->emails()->sendTemplate(
     to: ['ali@example.com'],
     template: 'order-receipt',                    // slug or ULID
     variables: ['order_id' => '1042'],
+);
+
+// …or design a branded message in code — HtmlMessageBuilder emits
+// email-client-safe HTML (table layout, inlined CSS, 600px centered card;
+// Gmail/Outlook-proof). RTL-first: make() defaults to dir="rtl" lang="ar".
+use Okta\Connect\WhatsApp\Email\HtmlMessageBuilder;
+
+$message = HtmlMessageBuilder::make()             // make(false) ⇒ LTR
+    ->brandColor('#10b981')
+    ->logo('https://cdn.acme.com/logo.png')
+    ->preheader('طلبك في الطريق')                 // hidden inbox preview text
+    ->heading('شكراً لطلبك!')
+    ->paragraph('طلبك رقم 1042 قيد التجهيز الآن.')
+    ->button('تتبع الطلب', 'https://acme.com/orders/1042')
+    ->divider()
+    ->footer('© 2026 Acme — جميع الحقوق محفوظة');
+
+// sendHtml() accepts the builder directly (any Stringable) and a bare
+// string recipient; both are normalised for you:
+$client->emails()->sendHtml(
+    'Acme <hello@mail.acme.com>',
+    'ali@example.com',
+    'طلبك رقم 1042',
+    $message,
 );
 
 // Send log + a single message
