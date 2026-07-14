@@ -5,6 +5,26 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] — 2026-07-14
+
+### Added
+- **`Connect\Connect` — OAuth-style "connect with one click".** Obtain an API
+  token for a user's organization without any hand-copied keys:
+  - `Client::connect(string $baseUrl): Connect` (or `new Connect($baseUrl)`) —
+    a token-less helper, since this is how you *get* a token.
+  - `authorizationUrl(string $appName, string $redirectUri, array $abilities = ['read'], ?string $state = null): string`
+    builds the `/connect` consent URL; abilities are filtered to the known
+    `read`/`write`/`send`/`admin` set.
+  - `Connect::generateState(int $bytes = 24): string` — opaque CSRF `state`.
+  - `handleCallback(array $query, string $redirectUri, ?string $expectedState = null): DTO\AccessToken`
+    verifies `state`, surfaces `?error=` denials, and exchanges the one-time
+    code — the recommended entry point.
+  - `exchange(string $code, string $redirectUri): DTO\AccessToken` — the raw
+    `POST /api/v1/oauth/token` call.
+- **`DTO\AccessToken`** — `accessToken`, `tokenType`, `abilities`, `expiresAt`,
+  plus `can(string $ability): bool`. Feed `$token->accessToken` straight into a
+  `Client`.
+
 ## [1.1.0] — 2026-07-14
 
 ### Added

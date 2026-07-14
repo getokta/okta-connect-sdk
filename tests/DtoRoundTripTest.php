@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Okta\Connect\WhatsApp\Tests;
 
+use Okta\Connect\WhatsApp\DTO\AccessToken;
 use Okta\Connect\WhatsApp\DTO\Channel;
 use Okta\Connect\WhatsApp\DTO\Contact;
 use Okta\Connect\WhatsApp\DTO\Conversation;
@@ -91,6 +92,23 @@ final class DtoRoundTripTest extends TestCase
 
         $this->assertSame(['read', 'send'], $out['abilities']);
         $this->assertSame('abc.def', $out['plain_text_token']);
+    }
+
+    public function test_access_token_round_trip_and_ability_check(): void
+    {
+        $payload = [
+            'access_token' => '1|abc',
+            'token_type' => 'Bearer',
+            'abilities' => ['read', 'send'],
+            'expires_at' => '2026-10-12T00:00:00+00:00',
+        ];
+
+        $dto = AccessToken::fromArray($payload);
+
+        $this->assertSame('1|abc', $dto->accessToken);
+        $this->assertTrue($dto->can('read'));
+        $this->assertFalse($dto->can('admin'));
+        $this->assertSame($payload, $dto->toArray());
     }
 
     public function test_template_round_trip(): void
