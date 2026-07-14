@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Okta\Connect\WhatsApp;
 
+use Okta\Connect\WhatsApp\Connect\Connect;
 use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
@@ -67,6 +68,22 @@ final class Client
 
         $this->http = $httpClient ?? new HttpClient($config);
         $this->baseUrl = $baseUrl;
+    }
+
+    /**
+     * Start the OAuth-style "connect with one click" flow — no token needed
+     * yet, since this is how you obtain one. Build the consent URL, then
+     * exchange the returned code for an access token:
+     *
+     *   $connect = Client::connect('https://connect.getokta.io');
+     *   $url     = $connect->authorizationUrl('My CRM', $redirectUri, ['read', 'send'], $state);
+     *   // ...user authorizes, returns to $redirectUri with ?code=&state=
+     *   $token   = $connect->handleCallback($request->query(), $redirectUri, $state);
+     *   $client  = new Client('https://connect.getokta.io', $token->accessToken);
+     */
+    public static function connect(string $baseUrl): Connect
+    {
+        return new Connect($baseUrl);
     }
 
     /**

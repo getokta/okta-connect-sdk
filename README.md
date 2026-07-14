@@ -205,6 +205,47 @@ $client->campaigns()->queue($campaign->id);
 > to keep the public attack surface minimal. Call those endpoints directly
 > from a trusted backend if you operate the platform.
 
+### Connecting an account (OAuth-style, one click)
+
+The easy way to get a token for a user's organization — no copy-pasting API
+keys. Send the user to the consent screen, then swap the returned one-time code
+for a token. No `client_secret`, no PKCE: the code is single-use, expires in
+5 minutes, and is bound to your `redirect_uri`.
+
+```php
+use Okta\Connect\WhatsApp\Client;
+
+$connect     = Client::connect('https://connect.getokta.io'); // no token yet
+$redirectUri = 'https://crm.example.com/oktawa/callback';
+
+// 1) Redirect the user to the consent screen. Keep `state` in the session.
+$state = \Okta\Connect\WhatsApp\Connect\Connect::generateState();
+$_SESSION['okta_state'] = $state;
+
+$url = $connect->authorizationUrl(
+    appName:     'My CRM',
+    redirectUri: $redirectUri,
+    abilities:   ['read', 'send'],   // subset of read/write/send/admin
+    state:       $state,
+);
+// header('Location: '.$url);
+
+// 2) On the callback, verify state and exchange the code in one call:
+$token  = $connect->handleCallback($_GET, $redirectUri, $_SESSION['okta_state']);
+
+// 3) You now have a ready-to-use token — build a client and go.
+$client = new Client('https://connect.getokta.io', $token->accessToken);
+
+$token->abilities;          // ['read', 'send'] — what the user granted
+$token->can('send');        // true
+$token->expiresAt;          // ISO-8601 string, or null
+```
+
+`handleCallback()` throws a `WhatsAppException` when the user denied consent
+(`?error=access_denied`), the `state` doesn't match (CSRF), or no code is
+present. Prefer it over calling `exchange($code, $redirectUri)` directly so the
+security checks always run.
+
 ### Embedding the inbox (iframe)
 
 Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Obtain the
