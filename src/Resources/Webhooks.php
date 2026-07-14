@@ -6,6 +6,8 @@ namespace Okta\Connect\WhatsApp\Resources;
 
 use Okta\Connect\WhatsApp\DTO\PaginatedResult;
 use Okta\Connect\WhatsApp\DTO\Webhook;
+use Okta\Connect\WhatsApp\DTO\WebhookNotification;
+use Okta\Connect\WhatsApp\Exceptions\WhatsAppException;
 
 /**
  * Webhook subscription management — register outbound webhooks over the API
@@ -92,5 +94,42 @@ final class Webhooks extends Resource
         $expected = 'sha256='.hash_hmac('sha256', $rawBody, $secret);
 
         return hash_equals($expected, $signatureHeader);
+    }
+
+    /**
+     * Verify + decode an inbound webhook delivery into a typed
+     * {@see WebhookNotification}. Pass the RAW request body; supply the
+     * `X-Okta-Signature` header and your subscription secret to have the HMAC
+     * checked first (strongly recommended — omit both only when you verify out
+     * of band).
+     *
+     *   $hook = Webhooks::parse(file_get_contents('php://input'),
+     *       $_SERVER['HTTP_X_OKTA_SIGNATURE'] ?? '', $secret);
+     *   match ($hook->type()) {
+     *       WebhookEvent::MessageSent     => reactToSend($hook),
+     *       WebhookEvent::MessageReceived => reactToInbound($hook),
+     *       default => null,
+     *   };
+     *
+     * @throws WhatsAppException On a signature mismatch or a body that isn't a
+     *                           JSON object.
+     */
+    public static function parse(string $rawBody, ?string $signatureHeader = null, ?string $secret = null): WebhookNotification
+    {
+        if ($secret !== null) {
+            if ($signatureHeader === null || ! self::verifySignature($rawBody, $signatureHeader, $secret)) {
+                throw new WhatsAppException('Webhook signature verification failed.', 400);
+            }
+        }
+
+        /** @var mixed $decoded */
+        $decoded = json_decode($rawBody, true);
+
+        if (! is_array($decoded)) {
+            throw new WhatsAppException('Webhook body is not a JSON object.', 400);
+        }
+
+        /** @var array<string, mixed> $decoded */
+        return WebhookNotification::fromArray($decoded);
     }
 }

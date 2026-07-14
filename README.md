@@ -227,6 +227,7 @@ $url = $connect->authorizationUrl(
     redirectUri: $redirectUri,
     abilities:   ['read', 'send'],   // subset of read/write/send/admin
     state:       $state,
+    logoUrl:     'https://cdn.my-crm.com/logo.png', // optional — shown on consent (https only)
 );
 // header('Location: '.$url);
 
@@ -309,6 +310,34 @@ $ok = Webhooks::verifySignature(
     signatureHeader: $_SERVER['HTTP_X_OKTA_SIGNATURE'] ?? '',
     secret: $secret,
 );
+```
+
+Or **verify + decode in one step** into a typed `WebhookNotification` and branch on
+the event. Message events carry which conversation + channel they belong to and
+whether they're a reply:
+
+```php
+use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Resources\Webhooks;
+
+$hook = Webhooks::parse(
+    rawBody: file_get_contents('php://input'),
+    signatureHeader: $_SERVER['HTTP_X_OKTA_SIGNATURE'] ?? '',
+    secret: $secret,                                 // throws on a bad signature
+);
+
+match ($hook->type()) {
+    WebhookEvent::MessageSent, WebhookEvent::MessageReceived => handleMessage(
+        conversation: $hook->conversationId(),   // which conversation
+        channel:      $hook->channelType(),      // which channel
+        body:         $hook->messageBody(),
+        isReply:      $hook->isReply(),          // …and whether it's a reply
+    ),
+    WebhookEvent::MessageDelivered, WebhookEvent::MessageRead => updateReceipt($hook),
+    WebhookEvent::ChannelDeleted   => teardown($hook->get('channel.id')),
+    default => null,
+};
+// $hook->get('any.dotted.path') reads anything from the event payload.
 ```
 
 ### Idempotency

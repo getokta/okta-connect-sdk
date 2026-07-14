@@ -52,6 +52,28 @@ final class ConnectTest extends TestCase
         $this->assertSame('opaque-csrf-token', $q['state']);
     }
 
+    public function test_authorization_url_includes_a_logo_when_given(): void
+    {
+        $url = $this->connect()->authorizationUrl(
+            appName: 'My CRM',
+            redirectUri: 'https://crm.example.com/cb',
+            abilities: ['read'],
+            state: null,
+            logoUrl: 'https://cdn.example.com/logo.png',
+        );
+
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
+        $this->assertSame('https://cdn.example.com/logo.png', $q['logo']);
+    }
+
+    public function test_authorization_url_omits_logo_when_absent(): void
+    {
+        $url = $this->connect()->authorizationUrl('My CRM', 'https://crm.example.com/cb');
+
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
+        $this->assertArrayNotHasKey('logo', $q);
+    }
+
     public function test_authorization_url_drops_unknown_abilities_and_empty_state(): void
     {
         $url = $this->connect()->authorizationUrl(
