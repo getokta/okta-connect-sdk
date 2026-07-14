@@ -66,12 +66,17 @@ final class Connect
      * @param  list<string>  $abilities  Subset of read/write/send/admin.
      * @param  string|null   $state      Opaque CSRF token — store it and verify
      *                                   it on the callback (see handleCallback).
+     * @param  string|null   $logoUrl    Your app's logo, shown on the consent
+     *                                   screen. Must be an https URL; the
+     *                                   platform re-validates and silently drops
+     *                                   anything unsafe (non-https, private host…).
      */
     public function authorizationUrl(
         string $appName,
         string $redirectUri,
         array $abilities = ['read'],
         ?string $state = null,
+        ?string $logoUrl = null,
     ): string {
         $abilities = array_values(array_filter(
             $abilities,
@@ -86,6 +91,10 @@ final class Connect
 
         if ($state !== null && $state !== '') {
             $params['state'] = $state;
+        }
+
+        if ($logoUrl !== null && $logoUrl !== '') {
+            $params['logo'] = $logoUrl;
         }
 
         return $this->baseUrl.'/connect?'.http_build_query($params);

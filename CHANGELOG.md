@@ -24,6 +24,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **`DTO\AccessToken`** — `accessToken`, `tokenType`, `abilities`, `expiresAt`,
   plus `can(string $ability): bool`. Feed `$token->accessToken` straight into a
   `Client`.
+- **`Connect::authorizationUrl(... , ?string $logoUrl = null)`** — pass your
+  app's logo (https URL) to show it on the consent screen. The platform
+  re-validates and drops anything unsafe.
+- **`Webhooks::parse($rawBody, $signatureHeader?, $secret?): DTO\WebhookNotification`**
+  — verify the HMAC and decode a delivery in one call. `WebhookNotification`
+  exposes `type(): ?WebhookEvent`, `is()`, `isMessageEvent()`, a dotted
+  `get('message.body')` reader, and message helpers `conversationId()`,
+  `channelType()`, `messageBody()`, `isReply()`.
+- The `message.*` webhook events (`message.received/sent/delivered/read/failed`)
+  are now emitted by the platform per organization, carrying conversation +
+  channel context and reply info — consume them with `Webhooks::parse()`.
 
 ## [1.1.0] — 2026-07-14
 

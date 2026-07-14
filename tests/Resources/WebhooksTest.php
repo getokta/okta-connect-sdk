@@ -107,4 +107,47 @@ final class WebhooksTest extends TestCase
         $this->assertFalse(Webhooks::verifySignature($body, 'sha256=deadbeef', $secret));
         $this->assertFalse(Webhooks::verifySignature($body.'tampered', $header, $secret));
     }
+
+    public function test_parse_verifies_and_decodes_a_message_delivery(): void
+    {
+        $secret = 'top-secret';
+        $body = (string) json_encode([
+            'event' => 'message.sent',
+            'organization_id' => 42,
+            'payload' => [
+                'message' => ['id' => '01H', 'direction' => 'out', 'body' => 'hi', 'is_reply' => true],
+                'conversation' => ['id' => '01HC', 'kind' => 'dm'],
+                'channel' => ['id' => '01HCH', 'type' => 'telegram', 'name' => 'Bot'],
+            ],
+            'delivery_id' => '01HD',
+            'sent_at' => '2026-07-14T00:00:00+00:00',
+        ]);
+        $header = 'sha256='.hash_hmac('sha256', $body, $secret);
+
+        $hook = \Okta\Connect\WhatsApp\Resources\Webhooks::parse($body, $header, $secret);
+
+        $this->assertSame(\Okta\Connect\WhatsApp\Enums\WebhookEvent::MessageSent, $hook->type());
+        $this->assertTrue($hook->isMessageEvent());
+        $this->assertSame(42, $hook->organizationId);
+        $this->assertSame('01HC', $hook->conversationId());
+        $this->assertSame('telegram', $hook->channelType());
+        $this->assertSame('hi', $hook->messageBody());
+        $this->assertTrue($hook->isReply());
+        $this->assertSame('01HD', $hook->deliveryId);
+    }
+
+    public function test_parse_rejects_a_bad_signature(): void
+    {
+        $this->expectException(\Okta\Connect\WhatsApp\Exceptions\WhatsAppException::class);
+        \Okta\Connect\WhatsApp\Resources\Webhooks::parse('{"event":"message.sent"}', 'sha256=bad', 'secret');
+    }
+
+    public function test_parse_without_a_secret_skips_verification(): void
+    {
+        $hook = \Okta\Connect\WhatsApp\Resources\Webhooks::parse('{"event":"channel.deleted","organization_id":7}');
+
+        $this->assertSame(\Okta\Connect\WhatsApp\Enums\WebhookEvent::ChannelDeleted, $hook->type());
+        $this->assertFalse($hook->isMessageEvent());
+        $this->assertNull($hook->conversationId());
+    }
 }
