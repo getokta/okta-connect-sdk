@@ -232,6 +232,44 @@ $ssoUrl = $embed->ssoUrl($operator, redirectPath: '/app/inbox?embedded=1');
 Unknown `ui_hide` keys and out-of-range TTLs throw at mint time, so misconfigured
 embeds fail loudly here instead of silently in the browser.
 
+### Webhooks
+
+Register outbound webhooks over the API instead of adding them by hand in the
+dashboard. The signing `secret` is returned **once** on create — store it.
+
+```php
+use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Resources\Webhooks;
+
+$hook = $client->webhooks()->create([
+    'name'   => 'Lifecycle',
+    'url'    => 'https://example.test/hooks/okta',
+    'events' => [
+        WebhookEvent::SubscriptionExpired->value,   // subscription ended
+        WebhookEvent::SubscriptionCancelled->value, // cancelled
+        WebhookEvent::ChannelDeleted->value,        // a channel was removed
+        WebhookEvent::ChannelDisconnected->value,   // …or disconnected
+    ],
+    // 'events' => [WebhookEvent::All->value],       // or receive everything
+]);
+
+$secret = $hook->secret; // shown ONCE — persist it now
+
+$client->webhooks()->list();          // PaginatedResult<Webhook> (no secret)
+$client->webhooks()->delete($hook->id);
+```
+
+Verify inbound deliveries before trusting them — the platform signs the raw body
+with your secret and sends it in `X-Okta-Signature: sha256=<hmac>`:
+
+```php
+$ok = Webhooks::verifySignature(
+    rawBody: file_get_contents('php://input'),
+    signatureHeader: $_SERVER['HTTP_X_OKTA_SIGNATURE'] ?? '',
+    secret: $secret,
+);
+```
+
 ### Idempotency
 
 Mutating calls accept an optional `Idempotency-Key` header so safe retries are server-deduped:
