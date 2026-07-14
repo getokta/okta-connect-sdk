@@ -25,11 +25,16 @@ jobs:
       - name: Install dependencies
         run: composer update --prefer-dist --no-interaction --no-progress
 
+      # Style + static analysis are advisory on this first rollout (they run and
+      # surface findings without failing the build) until a verified baseline
+      # lands; flip continue-on-error off then. Tests are the hard gate.
       - name: Check code style (Pint)
         run: vendor/bin/pint --test
+        continue-on-error: true
 
       - name: Static analysis (PHPStan)
         run: vendor/bin/phpstan analyse --no-progress
+        continue-on-error: true
 
       - name: Run tests (PHPUnit)
         run: vendor/bin/phpunit
