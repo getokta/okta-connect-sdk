@@ -5,6 +5,28 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-07-14
+
+### Added
+- **`Resources\Webhooks` — full lifecycle management.** In addition to the
+  existing `register()`, the resource now offers:
+  - `create(array $payload, ?string $idempotencyKey = null): DTO\Webhook` —
+    register a subscription and receive a typed `Webhook`. The signing
+    `secret` is present on `$webhook->secret` **exactly once** (on create) and
+    is never returned again.
+  - `list(array $filters = []): PaginatedResult<Webhook>` — the org's
+    subscriptions (no secret).
+  - `delete(string $id): bool` — remove a subscription by ULID.
+  - `Webhooks::verifySignature(string $rawBody, string $signatureHeader, string $secret): bool`
+    — constant-time (`hash_equals`) check of the `X-Okta-Signature` header.
+- **`Enums\WebhookEvent`** — a backed string enum of every outbound event name,
+  value-identical to the platform's dotted strings, including the new lifecycle
+  events `subscription.activated|cancelled|expired|past_due` and
+  `channel.connected|disconnected|deleted`. Helpers `isChannelLifecycle()` and
+  `isSubscription()`.
+- **`DTO\Webhook`** — typed subscription record (`id`, `name`, `url`, `events`,
+  `isActive`, `maxAttempts`, `secret`, `createdAt`).
+
 ## [1.0.0] — 2026-07-13
 
 ### Changed — BREAKING
