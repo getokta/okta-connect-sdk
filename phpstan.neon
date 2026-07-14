@@ -1,0 +1,7 @@
+parameters:
+    # Level 6 today (fully green on the strict-typed src); ratchet toward max
+    # once a baseline is generated. Runs in CI on every PR.
+    level: 6
+    paths:
+        - src
+    treatPhpDocTypesAsCertain: false

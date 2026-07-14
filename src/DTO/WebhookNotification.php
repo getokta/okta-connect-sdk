@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\DTO;
 
 use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Webhook\ChannelEvent;
+use Okta\Connect\WhatsApp\Webhook\MessageEvent;
+use Okta\Connect\WhatsApp\Webhook\SubscriptionEvent;
 
 /**
  * A parsed inbound webhook delivery.
@@ -88,6 +91,26 @@ final class WebhookNotification
         }
 
         return $value;
+    }
+
+    // ---- typed per-family views (null when the event isn't in that family) --
+
+    /** A typed view over a message.* payload. */
+    public function message(): ?MessageEvent
+    {
+        return $this->isMessageEvent() ? new MessageEvent($this->payload) : null;
+    }
+
+    /** A typed view over a channel.* payload. */
+    public function channel(): ?ChannelEvent
+    {
+        return str_starts_with($this->event, 'channel.') ? new ChannelEvent($this->payload) : null;
+    }
+
+    /** A typed view over a subscription.* payload. */
+    public function subscription(): ?SubscriptionEvent
+    {
+        return str_starts_with($this->event, 'subscription.') ? new SubscriptionEvent($this->payload) : null;
     }
 
     // ---- message.* convenience accessors (null when not applicable) ---------

@@ -340,6 +340,42 @@ match ($hook->type()) {
 // $hook->get('any.dotted.path') reads anything from the event payload.
 ```
 
+Prefer a **router** over a `match`, and typed per-family views over raw arrays:
+
+```php
+use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Webhook\WebhookRouter;
+
+(new WebhookRouter($secret))                     // verifies the signature
+    ->on(WebhookEvent::MessageReceived, fn ($h) => reply($h->message()->conversationId()))
+    ->onMessage(fn ($h) => log($h->message()->status()))   // any message.*
+    ->onChannel(fn ($h) => sync($h->channel()->channelId()))
+    ->onSubscription(fn ($h) => billing($h->subscription()->status()))
+    ->onAny(fn ($h) => audit($h))                          // fallback
+    ->dispatch(file_get_contents('php://input'), $_SERVER['HTTP_X_OKTA_SIGNATURE'] ?? '');
+```
+
+`$hook->message()`, `->channel()`, `->subscription()` return typed views
+(`MessageEvent`/`ChannelEvent`/`SubscriptionEvent`) — or `null` for a different
+family.
+
+### More resources — tickets, tags, analytics
+
+```php
+// Support tickets
+$ticket = $client->tickets()->open(['subject' => 'Order stuck', 'contact_id' => $contactUlid]);
+$client->tickets()->transition($ticket->id, ['stage_id' => $resolvedStageUlid]);
+$client->tickets()->list(['status' => 'open']);   // PaginatedResult<Ticket>
+
+// CRM tags — apply slugs to a contact (unknown slugs are created)
+$client->tags()->applyToContact($contactUlid, ['vip', 'lead']);
+$client->tags()->list();                           // PaginatedResult<Tag>
+
+// Read-only analytics — aggregate totals over a date range
+$m = $client->analytics()->metrics(['from' => '2026-06-01', 'to' => '2026-06-30', 'platform' => 'whatsapp']);
+$m->metric('messages.inbound');                    // 120
+```
+
 ### Idempotency
 
 Mutating calls accept an optional `Idempotency-Key` header so safe retries are server-deduped:
