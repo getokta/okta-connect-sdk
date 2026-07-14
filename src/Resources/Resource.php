@@ -16,9 +16,22 @@ use Okta\Connect\WhatsApp\Http\HttpClientInterface;
  */
 abstract class Resource
 {
+    /**
+     * Single source of truth for the API version prefix. Newer resources build
+     * their paths through {@see self::api()} so a future `/api/v2` is a one-line
+     * change here rather than a search across every resource.
+     */
+    protected const API_PREFIX = '/api/v1';
+
     public function __construct(
         protected readonly HttpClientInterface $http,
     ) {
+    }
+
+    /** Prefix a version-less path with the API version, e.g. api('/tickets'). */
+    protected function api(string $path): string
+    {
+        return self::API_PREFIX.'/'.ltrim($path, '/');
     }
 
     /**

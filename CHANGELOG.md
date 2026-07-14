@@ -35,6 +35,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - The `message.*` webhook events (`message.received/sent/delivered/read/failed`)
   are now emitted by the platform per organization, carrying conversation +
   channel context and reply info — consume them with `Webhooks::parse()`.
+- **New resources:** `tickets()` (list / get / open / transition),
+  `tags()` (list + `applyToContact()`), and `analytics()->metrics()` (typed
+  `DTO\AnalyticsMetrics` totals over a date range). New DTOs `Ticket`, `Tag`,
+  `AnalyticsMetrics`.
+- **`Webhook\WebhookRouter`** — register a handler per event (or per family:
+  `onMessage`/`onChannel`/`onSubscription`/`onEmail`/`onAny`) and `dispatch()`
+  a raw request; it verifies the signature and runs every matching handler.
+- **Typed webhook views** — `WebhookNotification::message()` / `channel()` /
+  `subscription()` return `Webhook\MessageEvent` / `ChannelEvent` /
+  `SubscriptionEvent` with named accessors (e.g. `$hook->message()?->channelType()`).
+- **Tooling:** the API version prefix is centralized on `Resource` (`api()`);
+  added `phpstan.neon`, `pint.json`, and a GitHub Actions CI matrix (PHPUnit +
+  Pint + PHPStan on PHP 8.2 / 8.3 / 8.4).
 
 ## [1.1.0] — 2026-07-14
 

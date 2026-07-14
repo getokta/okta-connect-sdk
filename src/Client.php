@@ -8,6 +8,7 @@ use Okta\Connect\WhatsApp\Connect\Connect;
 use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
+use Okta\Connect\WhatsApp\Resources\Analytics;
 use Okta\Connect\WhatsApp\Resources\Campaigns;
 use Okta\Connect\WhatsApp\Resources\Channels;
 use Okta\Connect\WhatsApp\Resources\Contacts;
@@ -18,7 +19,9 @@ use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
 use Okta\Connect\WhatsApp\Resources\Messages;
 use Okta\Connect\WhatsApp\Resources\SocialPosts;
+use Okta\Connect\WhatsApp\Resources\Tags;
 use Okta\Connect\WhatsApp\Resources\Templates;
+use Okta\Connect\WhatsApp\Resources\Tickets;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Psr\Http\Client\ClientInterface;
 
@@ -47,6 +50,9 @@ final class Client
     private ?Emails $emails = null;
     private ?SocialPosts $socialPosts = null;
     private ?Campaigns $campaigns = null;
+    private ?Tickets $tickets = null;
+    private ?Tags $tags = null;
+    private ?Analytics $analytics = null;
 
     /**
      * @param  array{timeout?: int, retries?: int, httpClient?: ClientInterface, userAgent?: string}  $options
@@ -198,6 +204,32 @@ final class Client
     public function campaigns(): Campaigns
     {
         return $this->campaigns ??= new Campaigns($this->http);
+    }
+
+    /**
+     * Support tickets — open, transition across pipeline stages, and read the
+     * queue.
+     */
+    public function tickets(): Tickets
+    {
+        return $this->tickets ??= new Tickets($this->http);
+    }
+
+    /**
+     * CRM tags — list the org's tags and apply tag slugs to a contact.
+     */
+    public function tags(): Tags
+    {
+        return $this->tags ??= new Tags($this->http);
+    }
+
+    /**
+     * Read-only analytics — aggregate metric totals over a date range across
+     * conversations + social.
+     */
+    public function analytics(): Analytics
+    {
+        return $this->analytics ??= new Analytics($this->http);
     }
 
     /**
