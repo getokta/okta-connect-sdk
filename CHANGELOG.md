@@ -5,6 +5,18 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] — 2026-07-15
+
+### Added
+- **`webhooks` ability** — a dedicated least-privilege scope for managing
+  webhook subscriptions (list / register / remove) without granting full
+  `admin`. Pass it to `Connect::authorizationUrl(abilities: ['read', 'webhooks'])`
+  and it now survives the ability filter (the consent screen renders it too).
+- **`Channels::delete($id)`** — delete a channel over the API (disconnects it,
+  emits `channel.deleted`, then removes it). The programmatic way to prune
+  stale/awaiting-scan WhatsApp links; needs a `write` (or `admin`) token. Plus
+  a `Channels::awaitingScan(?type)` convenience to find them.
+
 ## [1.3.0] — 2026-07-15
 
 ### Added
@@ -32,10 +44,6 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Tooling:** the API version prefix is centralized on `Resource` (`api()`);
   added `phpstan.neon`, `pint.json`, and a GitHub Actions CI matrix (PHPUnit +
   Pint + PHPStan on PHP 8.2 / 8.3 / 8.4).
-- **`webhooks` ability** — a dedicated least-privilege scope for managing
-  webhook subscriptions (list / register / remove) without granting full
-  `admin`. Pass it to `Connect::authorizationUrl(abilities: ['read', 'webhooks'])`
-  and it now survives the ability filter (the consent screen renders it too).
 
 ## [1.2.0] — 2026-07-14
 

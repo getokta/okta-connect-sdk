@@ -61,6 +61,12 @@ $client->channels()->whatsapp('connected');       // both WhatsApp flavours
 $client->channels()->connected();                 // any platform, connected
 $client->channels()->disconnected('instagram_dm');
 
+// Prune stale channels — e.g. old WhatsApp links never scanned. delete()
+// needs a `write` (or `admin`) token; it disconnects + emits channel.deleted.
+foreach ($client->channels()->awaitingScan('baileys')->items() as $stale) {
+    $client->channels()->delete($stale->id);
+}
+
 // Meta message templates
 $templates = $client->templates()->list(['status' => 'APPROVED', 'language' => 'ar']);
 $client->templates()->send([

@@ -83,10 +83,36 @@ final class Channels extends Resource
             : $this->listByType($type, 'disconnected');
     }
 
+    /**
+     * Convenience: channels stuck "awaiting scan" — WhatsApp (baileys) links
+     * whose QR was never scanned. Combine with delete() to prune stale ones.
+     *
+     * @return PaginatedResult<Channel>
+     */
+    public function awaitingScan(?string $type = null): PaginatedResult
+    {
+        return $type === null
+            ? $this->list(['status' => 'awaiting_scan'])
+            : $this->listByType($type, 'awaiting_scan');
+    }
+
     public function get(string $id): Channel
     {
         $response = $this->http->get('/api/v1/channels/'.rawurlencode($id));
 
         return Channel::fromArray($this->unwrap($response->json()));
+    }
+
+    /**
+     * Delete a channel. Disconnects it (stopping any live WhatsApp gateway
+     * session), emits a `channel.deleted` webhook, then removes it — the
+     * programmatic way to prune stale/awaiting-scan channels. Requires a token
+     * with the `write` (or `admin`) ability. Returns true on success.
+     */
+    public function delete(string $id): bool
+    {
+        $response = $this->http->delete('/api/v1/channels/'.rawurlencode($id));
+
+        return ($response->json()['deleted'] ?? false) === true;
     }
 }
