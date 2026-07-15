@@ -20,6 +20,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   workspace it connected to via unified login (`POST /api/v1/oauth/revoke`):
   the token is revoked and a `connection.revoked` webhook fires. New
   `WebhookEvent::ConnectionRevoked` (payload `source` = `app` | `workspace`).
+- **`Client::connection()` / `Client::can()`** — introspect the token's grant
+  (`GET /api/v1/oauth/introspect`): abilities, app name, bound workspace,
+  expiry. New `DTO\Connection` with `can()` and `missing([...])`. To add
+  abilities, send the user back through `Connect::authorizationUrl()` with the
+  fuller set — the consent screen now flags what's new and the exchange
+  replaces the old grant.
 
 ## [1.3.0] — 2026-07-15
 

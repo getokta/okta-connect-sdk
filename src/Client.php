@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp;
 
 use Okta\Connect\WhatsApp\Connect\Connect;
+use Okta\Connect\WhatsApp\DTO\Connection;
 use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
@@ -230,6 +231,27 @@ final class Client
     public function analytics(): Analytics
     {
         return $this->analytics ??= new Analytics($this->http);
+    }
+
+    /**
+     * Introspect this connection (GET /api/v1/oauth/introspect): the abilities
+     * granted to the token this client holds, the app name, the bound
+     * workspace, and expiry. Use it to check what you may do before calling —
+     * and, when you need more, `$conn->missing([...])` tells you which
+     * abilities to request by sending the user back through Connect.
+     */
+    public function connection(): Connection
+    {
+        $response = $this->http->get('/api/v1/oauth/introspect');
+        $data = $response->json()['data'] ?? [];
+
+        return Connection::fromArray(is_array($data) ? $data : []);
+    }
+
+    /** Convenience: does the current token hold the given ability? */
+    public function can(string $ability): bool
+    {
+        return $this->connection()->can($ability);
     }
 
     /**

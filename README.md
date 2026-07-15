@@ -253,6 +253,25 @@ $token->expiresAt;          // ISO-8601 string, or null
 present. Prefer it over calling `exchange($code, $redirectUri)` directly so the
 security checks always run.
 
+**Checking your grant.** Introspect what the token may do, and ask for more when
+you need it — the consent screen highlights the new permissions and the exchange
+replaces the old, narrower grant:
+
+```php
+$conn = $client->connection();          // DTO\Connection
+$conn->abilities;                       // ['read', 'send']
+$conn->can('admin');                    // false
+$missing = $conn->missing(['read', 'admin']);   // ['admin']
+
+if ($missing !== []) {
+    // Send the user back through Connect with the fuller ability set.
+    $url = Client::connect($baseUrl)->authorizationUrl(
+        appName: 'My CRM', redirectUri: $redirectUri,
+        abilities: ['read', 'send', 'admin'], state: $state,
+    );
+}
+```
+
 **Disconnecting.** Your app can sever its own link at any time — the token is
 revoked and the workspace is notified via a `connection.revoked` webhook:
 
