@@ -58,4 +58,36 @@ final class ClientTest extends TestCase
         $this->assertSame('POST', $request->getMethod());
         $this->assertSame('/api/v1/oauth/revoke', $request->getUri()->getPath());
     }
+
+    public function test_connection_introspects_the_granted_abilities(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['data' => [
+                'app_name' => 'Frameo',
+                'abilities' => ['read', 'send'],
+                'organization' => ['id' => 'org_1', 'name' => 'Acme'],
+                'expires_at' => '2026-10-01T00:00:00+00:00',
+            ]]),
+        ], $history);
+
+        $conn = $client->connection();
+
+        $this->assertSame('/api/v1/oauth/introspect', $history[0]['request']->getUri()->getPath());
+        $this->assertSame('Frameo', $conn->appName);
+        $this->assertSame(['read', 'send'], $conn->abilities);
+        $this->assertSame('org_1', $conn->organizationId);
+        $this->assertTrue($conn->can('send'));
+        $this->assertFalse($conn->can('admin'));
+        $this->assertSame(['admin'], $conn->missing(['read', 'admin']));
+    }
+
+    public function test_can_checks_a_single_ability_via_introspection(): void
+    {
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['data' => ['app_name' => 'X', 'abilities' => ['read']]]),
+        ]);
+
+        $this->assertTrue($client->can('read'));
+    }
 }
