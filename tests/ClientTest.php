@@ -65,6 +65,7 @@ final class ClientTest extends TestCase
         $client = ResponseFactory::makeClient([
             ResponseFactory::json(200, ['data' => [
                 'app_name' => 'Frameo',
+                'logo_url' => 'https://cdn.frameo.net/logo.png',
                 'abilities' => ['read', 'send'],
                 'organization' => ['id' => 'org_1', 'name' => 'Acme'],
                 'expires_at' => '2026-10-01T00:00:00+00:00',
@@ -75,6 +76,7 @@ final class ClientTest extends TestCase
 
         $this->assertSame('/api/v1/oauth/introspect', $history[0]['request']->getUri()->getPath());
         $this->assertSame('Frameo', $conn->appName);
+        $this->assertSame('https://cdn.frameo.net/logo.png', $conn->logoUrl);
         $this->assertSame(['read', 'send'], $conn->abilities);
         $this->assertSame('org_1', $conn->organizationId);
         $this->assertTrue($conn->can('send'));

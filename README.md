@@ -260,6 +260,7 @@ replaces the old, narrower grant:
 ```php
 $conn = $client->connection();          // DTO\Connection
 $conn->abilities;                       // ['read', 'send']
+$conn->logoUrl;                         // the app logo you passed at connect (or its favicon)
 $conn->can('admin');                    // false
 $missing = $conn->missing(['read', 'admin']);   // ['admin']
 
