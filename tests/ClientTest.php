@@ -43,4 +43,19 @@ final class ClientTest extends TestCase
 
         $this->assertInstanceOf(Messages::class, $client->messages());
     }
+
+    public function test_revoke_connection_posts_to_oauth_revoke_and_returns_true(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['revoked' => true]),
+        ], $history);
+
+        $ok = $client->revokeConnection();
+
+        $this->assertTrue($ok);
+        $request = $history[0]['request'];
+        $this->assertSame('POST', $request->getMethod());
+        $this->assertSame('/api/v1/oauth/revoke', $request->getUri()->getPath());
+    }
 }

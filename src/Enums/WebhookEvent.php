@@ -51,6 +51,10 @@ enum WebhookEvent: string
     case EmailOpened = 'email.opened';
     case EmailClicked = 'email.clicked';
 
+    // A connected app's access was revoked — by the app itself
+    // (payload.source = "app") or by the workspace ("workspace").
+    case ConnectionRevoked = 'connection.revoked';
+
     /** True for channel.connected / .disconnected / .deleted. */
     public function isChannelLifecycle(): bool
     {

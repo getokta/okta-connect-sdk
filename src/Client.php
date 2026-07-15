@@ -233,6 +233,22 @@ final class Client
     }
 
     /**
+     * Disconnect this connection: revoke the access token this client is
+     * using (POST /api/v1/oauth/revoke). Afterwards every call with this token
+     * gets 401, and the workspace is notified via a `connection.revoked`
+     * webhook. Idempotent. Returns true on success.
+     *
+     * Use this to let your app "unlink" itself from a workspace it connected to
+     * through the Connect (unified login) flow.
+     */
+    public function revokeConnection(): bool
+    {
+        $response = $this->http->post('/api/v1/oauth/revoke');
+
+        return ($response->json()['revoked'] ?? false) === true;
+    }
+
+    /**
      * Embed integration surface — mint SSO / cookieless tokens and build
      * iframe URLs for the embedded inbox. Obtain the shared secret from
      * your platform operator (provisioned server-side under `embed.*`

@@ -16,6 +16,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   emits `channel.deleted`, then removes it). The programmatic way to prune
   stale/awaiting-scan WhatsApp links; needs a `write` (or `admin`) token. Plus
   a `Channels::awaitingScan(?type)` convenience to find them.
+- **`Client::revokeConnection()`** — an app can disconnect ITSELF from a
+  workspace it connected to via unified login (`POST /api/v1/oauth/revoke`):
+  the token is revoked and a `connection.revoked` webhook fires. New
+  `WebhookEvent::ConnectionRevoked` (payload `source` = `app` | `workspace`).
 
 ## [1.3.0] — 2026-07-15
 
