@@ -5,25 +5,9 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] — 2026-07-14
+## [1.3.0] — 2026-07-15
 
 ### Added
-- **`Connect\Connect` — OAuth-style "connect with one click".** Obtain an API
-  token for a user's organization without any hand-copied keys:
-  - `Client::connect(string $baseUrl): Connect` (or `new Connect($baseUrl)`) —
-    a token-less helper, since this is how you *get* a token.
-  - `authorizationUrl(string $appName, string $redirectUri, array $abilities = ['read'], ?string $state = null): string`
-    builds the `/connect` consent URL; abilities are filtered to the known
-    `read`/`write`/`send`/`admin` set.
-  - `Connect::generateState(int $bytes = 24): string` — opaque CSRF `state`.
-  - `handleCallback(array $query, string $redirectUri, ?string $expectedState = null): DTO\AccessToken`
-    verifies `state`, surfaces `?error=` denials, and exchanges the one-time
-    code — the recommended entry point.
-  - `exchange(string $code, string $redirectUri): DTO\AccessToken` — the raw
-    `POST /api/v1/oauth/token` call.
-- **`DTO\AccessToken`** — `accessToken`, `tokenType`, `abilities`, `expiresAt`,
-  plus `can(string $ability): bool`. Feed `$token->accessToken` straight into a
-  `Client`.
 - **`Connect::authorizationUrl(... , ?string $logoUrl = null)`** — pass your
   app's logo (https URL) to show it on the consent screen. The platform
   re-validates and drops anything unsafe.
@@ -48,6 +32,26 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Tooling:** the API version prefix is centralized on `Resource` (`api()`);
   added `phpstan.neon`, `pint.json`, and a GitHub Actions CI matrix (PHPUnit +
   Pint + PHPStan on PHP 8.2 / 8.3 / 8.4).
+
+## [1.2.0] — 2026-07-14
+
+### Added
+- **`Connect\Connect` — OAuth-style "connect with one click".** Obtain an API
+  token for a user's organization without any hand-copied keys:
+  - `Client::connect(string $baseUrl): Connect` (or `new Connect($baseUrl)`) —
+    a token-less helper, since this is how you *get* a token.
+  - `authorizationUrl(string $appName, string $redirectUri, array $abilities = ['read'], ?string $state = null): string`
+    builds the `/connect` consent URL; abilities are filtered to the known
+    `read`/`write`/`send`/`admin` set.
+  - `Connect::generateState(int $bytes = 24): string` — opaque CSRF `state`.
+  - `handleCallback(array $query, string $redirectUri, ?string $expectedState = null): DTO\AccessToken`
+    verifies `state`, surfaces `?error=` denials, and exchanges the one-time
+    code — the recommended entry point.
+  - `exchange(string $code, string $redirectUri): DTO\AccessToken` — the raw
+    `POST /api/v1/oauth/token` call.
+- **`DTO\AccessToken`** — `accessToken`, `tokenType`, `abilities`, `expiresAt`,
+  plus `can(string $ability): bool`. Feed `$token->accessToken` straight into a
+  `Client`.
 
 ## [1.1.0] — 2026-07-14
 
