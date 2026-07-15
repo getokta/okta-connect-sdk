@@ -145,4 +145,37 @@ final class ChannelsTest extends TestCase
 
         $this->assertSame('Main', $channel->displayName);
     }
+
+    public function test_awaiting_scan_filters_by_status(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['data' => []]),
+            ResponseFactory::json(200, ['data' => []]),
+        ], $history);
+
+        $client->channels()->awaitingScan();
+        $client->channels()->awaitingScan('baileys');
+
+        $this->assertSame('status=awaiting_scan', $history[0]['request']->getUri()->getQuery());
+
+        $query = $history[1]['request']->getUri()->getQuery();
+        $this->assertStringContainsString('type=baileys', $query);
+        $this->assertStringContainsString('status=awaiting_scan', $query);
+    }
+
+    public function test_delete_issues_a_delete_and_returns_true(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['deleted' => true]),
+        ], $history);
+
+        $ok = $client->channels()->delete('ch_1');
+
+        $this->assertTrue($ok);
+        $request = $history[0]['request'];
+        $this->assertSame('DELETE', $request->getMethod());
+        $this->assertSame('/api/v1/channels/ch_1', $request->getUri()->getPath());
+    }
 }
