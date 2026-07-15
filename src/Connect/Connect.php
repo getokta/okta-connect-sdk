@@ -50,7 +50,7 @@ final class Connect
      *
      * @var list<string>
      */
-    private const KNOWN_ABILITIES = ['read', 'write', 'send', 'admin'];
+    private const KNOWN_ABILITIES = ['read', 'write', 'send', 'webhooks', 'admin'];
 
     public function __construct(string $baseUrl, ?HttpClientInterface $http = null)
     {
@@ -63,7 +63,7 @@ final class Connect
     /**
      * Build the consent-screen URL to send the user to.
      *
-     * @param  list<string>  $abilities  Subset of read/write/send/admin.
+     * @param  list<string>  $abilities  Subset of read/write/send/webhooks/admin.
      * @param  string|null   $state      Opaque CSRF token — store it and verify
      *                                   it on the callback (see handleCallback).
      * @param  string|null   $logoUrl    Your app's logo, shown on the consent

@@ -87,6 +87,18 @@ final class ConnectTest extends TestCase
         $this->assertArrayNotHasKey('state', $q);
     }
 
+    public function test_authorization_url_keeps_the_dedicated_webhooks_ability(): void
+    {
+        $url = $this->connect()->authorizationUrl(
+            appName: 'App',
+            redirectUri: 'https://app.test/cb',
+            abilities: ['read', 'webhooks'],
+        );
+
+        parse_str((string) parse_url($url, PHP_URL_QUERY), $q);
+        $this->assertSame('read,webhooks', $q['abilities']);
+    }
+
     public function test_authorization_url_defaults_to_read_when_no_valid_ability(): void
     {
         $url = $this->connect()->authorizationUrl('App', 'https://app.test/cb', ['nope']);
