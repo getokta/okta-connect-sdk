@@ -22,10 +22,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   `WebhookEvent::ConnectionRevoked` (payload `source` = `app` | `workspace`).
 - **`Client::connection()` / `Client::can()`** — introspect the token's grant
   (`GET /api/v1/oauth/introspect`): abilities, app name, bound workspace,
-  expiry. New `DTO\Connection` with `can()` and `missing([...])`. To add
-  abilities, send the user back through `Connect::authorizationUrl()` with the
-  fuller set — the consent screen now flags what's new and the exchange
-  replaces the old grant.
+  expiry, and `logoUrl`. New `DTO\Connection` with `can()` and `missing([...])`.
+  To add abilities, send the user back through `Connect::authorizationUrl()`
+  with the fuller set — the consent screen now flags what's new and the
+  exchange replaces the old grant.
+- The `logoUrl` you pass to `authorizationUrl()` (or the app's site favicon when
+  you don't) is now **remembered** with the connection: it renders on the
+  workspace's "Connected apps" screen and comes back on `connection()->logoUrl`.
+  The platform re-validates it (https-only, no private hosts) before storing.
 
 ## [1.3.0] — 2026-07-15
 

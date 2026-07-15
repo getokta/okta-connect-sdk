@@ -30,6 +30,7 @@ final class Connection
         public readonly ?string $organizationName,
         public readonly ?string $expiresAt,
         public readonly ?string $lastUsedAt,
+        public readonly ?string $logoUrl = null,
         public readonly array $extra = [],
     ) {
     }
@@ -39,7 +40,7 @@ final class Connection
      */
     public static function fromArray(array $data): self
     {
-        $known = ['app_name', 'abilities', 'organization', 'expires_at', 'last_used_at'];
+        $known = ['app_name', 'logo_url', 'abilities', 'organization', 'expires_at', 'last_used_at'];
         $extra = array_diff_key($data, array_flip($known));
 
         $abilities = [];
@@ -58,6 +59,7 @@ final class Connection
             organizationName: isset($org['name']) ? (string) $org['name'] : null,
             expiresAt: isset($data['expires_at']) ? (string) $data['expires_at'] : null,
             lastUsedAt: isset($data['last_used_at']) ? (string) $data['last_used_at'] : null,
+            logoUrl: isset($data['logo_url']) ? (string) $data['logo_url'] : null,
             extra: $extra,
         );
     }
