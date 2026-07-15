@@ -32,6 +32,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - **Tooling:** the API version prefix is centralized on `Resource` (`api()`);
   added `phpstan.neon`, `pint.json`, and a GitHub Actions CI matrix (PHPUnit +
   Pint + PHPStan on PHP 8.2 / 8.3 / 8.4).
+- **`webhooks` ability** — a dedicated least-privilege scope for managing
+  webhook subscriptions (list / register / remove) without granting full
+  `admin`. Pass it to `Connect::authorizationUrl(abilities: ['read', 'webhooks'])`
+  and it now survives the ability filter (the consent screen renders it too).
 
 ## [1.2.0] — 2026-07-14
 

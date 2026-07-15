@@ -225,7 +225,7 @@ $_SESSION['okta_state'] = $state;
 $url = $connect->authorizationUrl(
     appName:     'My CRM',
     redirectUri: $redirectUri,
-    abilities:   ['read', 'send'],   // subset of read/write/send/admin
+    abilities:   ['read', 'send'],   // subset of read/write/send/webhooks/admin
     state:       $state,
     logoUrl:     'https://cdn.my-crm.com/logo.png', // optional — shown on consent (https only)
 );
@@ -278,6 +278,10 @@ embeds fail loudly here instead of silently in the browser.
 
 Register outbound webhooks over the API instead of adding them by hand in the
 dashboard. The signing `secret` is returned **once** on create — store it.
+
+A token needs the `webhooks` ability (a least-privilege scope for exactly this),
+or the broader `write` / `admin` scope. Request just `['read', 'webhooks']` when
+your app only manages webhooks and shouldn't touch anything else.
 
 ```php
 use Okta\Connect\WhatsApp\Enums\WebhookEvent;
