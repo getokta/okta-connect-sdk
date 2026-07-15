@@ -253,6 +253,17 @@ $token->expiresAt;          // ISO-8601 string, or null
 present. Prefer it over calling `exchange($code, $redirectUri)` directly so the
 security checks always run.
 
+**Disconnecting.** Your app can sever its own link at any time — the token is
+revoked and the workspace is notified via a `connection.revoked` webhook:
+
+```php
+$client->revokeConnection();   // true; every later call with this token 401s
+```
+
+The workspace can also unlink your app from its dashboard, which fires the same
+`connection.revoked` event (with `source: "workspace"`) to any webhook you
+registered — subscribe to it to react when access is pulled.
+
 ### Embedding the inbox (iframe)
 
 Mint embed tokens and build iframe URLs natively — no hand-rolled JWTs. Obtain the
