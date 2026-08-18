@@ -48,7 +48,7 @@ jobs:
         run: composer update --prefer-dist --no-interaction --no-progress
 
       - name: Run tests (PHPUnit)
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --no-coverage
 
       - name: Resolve version
         id: version
