@@ -1,0 +1,110 @@
+name: Release
+
+# Cutting a release means creating the `vX.Y.Z` tag: Packagist watches this
+# repository and publishes whatever a new tag points at.
+#
+# Two ways in, both landing on the same gate:
+#
+#   - push a `v*` tag, or
+#   - dispatch this workflow and let it create the tag at the commit it just
+#     tested (the supported path when the operator's credentials can't push
+#     tag refs — a restricted CI sandbox, for instance).
+#
+# Either way the full test gate runs before the tag exists, so a release can
+# never be cut from a commit whose suite is red.
+#
+# Every step is idempotent: an existing tag or release is reported and
+# skipped, not treated as an error, so a re-dispatch is the supported way to
+# finish a partial release.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, e.g. 2.0.0. Must match the top CHANGELOG entry.'
+        required: true
+        type: string
+
+permissions:
+  contents: write # create the tag + GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --no-progress
+
+      - name: Run tests (PHPUnit)
+        run: vendor/bin/phpunit
+
+      - name: Resolve version
+        id: version
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="${INPUT_VERSION#v}"
+          fi
+
+          # A tag with no matching changelog entry ships a release nobody can
+          # read — refuse rather than publish it unannounced.
+          if ! grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '## [$VERSION]' entry."
+            exit 1
+          fi
+
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          awk -v version="${{ steps.version.outputs.version }}" '
+            $0 ~ "^## \\[" version "\\]" { capture = 1; next }
+            capture && /^## \[/ { exit }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "See CHANGELOG.md for the details of this release." > release-notes.md
+          fi
+
+          cat release-notes.md
+
+      - name: Create the tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::notice::Release $TAG already exists — leaving it untouched."
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # The tag is what triggered us, so it already exists upstream.
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md --verify-tag
+          else
+            # Dispatched: create the tag at the exact commit we just tested.
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md --target "$GITHUB_SHA"
+          fi
+
+      - name: Packagist reminder
+        run: |
+          echo "::notice::Tag ${{ steps.version.outputs.tag }} is live. Packagist \
+          picks it up from the repository webhook; if the new version does not \
+          appear within a few minutes, hit 'Update' on the package page."
