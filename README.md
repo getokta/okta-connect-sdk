@@ -204,12 +204,14 @@ $campaign = $client->campaigns()->create([
 $client->campaigns()->queue($campaign->id);
 ```
 
-> **Platform-admin surface is not shipped in this public SDK.** Privileged
-> `platform.admin` operations (workspace/organization provisioning, token
-> minting, embed-secret provisioning) are performed server-side by the
-> platform operator and are intentionally excluded from this developer SDK
-> to keep the public attack surface minimal. Call those endpoints directly
-> from a trusted backend if you operate the platform.
+> **Provisioning workspaces?** That is the **Partner API**, not this SDK.
+> If you are building a product on top of Connect and need to create
+> workspaces, add and manage their users, mint workspace tokens or reserve
+> channels, apply for a technical-partner account: you get your own
+> `client_id`/`client_secret`, and the endpoints live under
+> `/api/v1/partner/*`. This SDK covers the per-workspace developer surface
+> only — messages, conversations, contacts, channels, templates, groups,
+> webhooks and embed tokens.
 
 ### Connecting an account (OAuth-style, one click)
 

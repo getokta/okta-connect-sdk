@@ -48,10 +48,9 @@ final class TokenMinter
 
     /**
      * Build a signed JWT for the given subject. `scope` controls which
-     * embedded surfaces the platform will allow:
-     *
-     *   - `platform.admin`  full /embed/* access
-     *   - `platform.inbox`  /embed/inbox/* only
+     * embedded surfaces the platform will allow; `platform.inbox`
+     * (the default, and the only scope this SDK mints) opens the
+     * embedded inbox.
      *
      * @param  array<string, mixed>  $extraClaims
      */
@@ -59,7 +58,7 @@ final class TokenMinter
         string $subject,
         string $email,
         string $name,
-        string $scope = 'platform.admin',
+        string $scope = 'platform.inbox',
         array $extraClaims = [],
     ): string {
         if ($subject === '' || $email === '') {
@@ -92,7 +91,7 @@ final class TokenMinter
         string $email,
         string $name,
         string $redirectPath,
-        string $scope = 'platform.admin',
+        string $scope = 'platform.inbox',
     ): string {
         $token = $this->mint($subject, $email, $name, $scope);
 

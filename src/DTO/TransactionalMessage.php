@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\DTO;
 
 /**
- * Outbound-only message returned by the admin transactional/OTP
- * endpoints (`POST /api/v1/admin/messages/transactional` and
- * `POST /api/v1/admin/messages/otp`).
+ * Outbound-only message returned by the transactional/OTP send
+ * endpoints.
  *
- * Both endpoints answer `202 Accepted` with this slimmer envelope —
+ * Both answer `202 Accepted` with this slimmer envelope —
  * the message is queued for delivery and never fans out to the agent
  * inbox stream. `id` is the platform's `msg_<ulid>` identifier.
  */
