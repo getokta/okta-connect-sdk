@@ -5,6 +5,29 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] — 2026-08-18
+
+### Removed (security hardening) — BREAKING
+- **Dropped `Embed::SCOPE_ADMIN`.** The constant, and the defaults that
+  pointed at it, minted embed JWTs carrying the platform-operator scope —
+  a grant no consumer of this SDK is entitled to, published in a package
+  anyone can read. `Embed::SCOPE_INBOX` is now the only scope this SDK
+  mints, and it is the default for `ssoToken()`, `ssoUrl()`,
+  `sessionToken()` and `embedUrl()`. Passing any other scope throws.
+  - **Migration:** replace `Embed::SCOPE_ADMIN` with `Embed::SCOPE_INBOX`,
+    or drop the argument entirely. If your integration genuinely relied on
+    operator-level embed access, that is a platform-operator concern and is
+    handled server-side, not from this package.
+- `Sso\TokenMinter::mint()` / `ssoUrl()` default to `platform.inbox`
+  instead of the operator scope, for the same reason.
+
+### Changed
+- Privileged endpoint paths and ability names were removed from doc blocks,
+  the README and historical changelog entries. Integrators building on
+  Connect provision workspaces through the **Partner API**
+  (`/api/v1/partner/*`) with their own `client_id`/`client_secret` — see the
+  platform's `docs/PARTNER_API.md`.
+
 ## [1.4.0] — 2026-07-15
 
 ### Added
@@ -225,11 +248,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   `AdminClient` (`Client::admin()`), all `Resources\Admin\*` (Workspaces,
   Organizations, WorkspaceUsers, WorkspaceTokens, WorkspaceChannels,
   EmbedSecret, admin Messages) and the admin-only `ProvisionedOrganization`
-  DTO. These wrapped privileged `platform.admin` endpoints (org/workspace
+  DTO. These wrapped a privileged platform-operator surface (org/workspace
   provisioning, API-token minting, embed-secret provisioning) and should not
   ship in a public developer package — publishing them needlessly documented
-  the privileged attack surface. The server-side endpoints are unchanged and
-  remain callable directly from a trusted backend by the platform operator.
+  an attack surface no reader of this SDK can call. Integrators who need
+  programmatic provisioning use the Partner API instead.
 - The developer-facing surface (messages, conversations, contacts, channels,
   templates, groups, webhooks, Meta/QR integrations, embed token minting) is
   unchanged.
@@ -275,16 +298,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   + add/remove participants + set picture + force resync. *(Shipped in code in
   0.4.x; first formally released and tagged here.)*
 - `AdminClient::messages()` — platform-workspace transactional messaging
-  (outbound-only, never fans out to the agent inbox; needs `platform.admin`
-  or `platform.inbox`).
-  - `transactional($payload)` — one-shot `text` or Cloud API `template`
-    (`POST /api/v1/admin/messages/transactional`).
+  (outbound-only, never fans out to the agent inbox).
+  - `transactional($payload)` — one-shot `text` or Cloud API `template`.
   - `otp($payload)` — one-time password over WhatsApp, server-throttled per
-    destination phone (`POST /api/v1/admin/messages/otp`).
+    destination phone.
 - `AdminClient::embedSecret()->provision($label, $issuer)` — provision a
   labelled per-partner embed-SSO secret bound to a specific JWT issuer in one
-  round-trip (`POST /api/v1/admin/embed-secret/provision`). Complements the
-  legacy `sync()` (which always returns the `iss=okta-web` secret).
+  round-trip. Complements the legacy `sync()`.
+  *(The whole `AdminClient` surface was removed in 1.3.0 — see above.)*
 
 ### New DTOs
 - `Template`, `TransactionalMessage`.
@@ -307,7 +328,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `status($ulid)` polls for the current QR string + TTL + channel status.
   - `QrSession::isConnected()` / `isTerminal()` convenience predicates.
 - `AdminClient::organizations()->create()` — backend-to-backend workspace
-  provisioning (`POST /api/v1/admin/organizations`). Returns a
+  provisioning. Returns a
   `ProvisionedOrganization` DTO carrying the created Organization + owner User
   + a usable Sanctum access token.
 - `AdminClient::embedSecret()->sync()` — fetch (and lazily provision) the

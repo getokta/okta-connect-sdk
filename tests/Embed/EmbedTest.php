@@ -37,7 +37,7 @@ final class EmbedTest extends TestCase
 
     public function test_sso_token_carries_expected_claims_and_signature(): void
     {
-        $jwt = $this->embed()->ssoToken($this->user(), Embed::SCOPE_ADMIN);
+        $jwt = $this->embed()->ssoToken($this->user(), Embed::SCOPE_INBOX);
         $parts = explode('.', $jwt);
 
         // Signature is HS256 over header.payload with the shared secret.
@@ -51,7 +51,7 @@ final class EmbedTest extends TestCase
         $this->assertSame('okta-whatsapp', $payload['aud']);
         $this->assertSame('u-1', $payload['sub']);
         $this->assertSame('Op@Acme.com', $payload['email']);
-        $this->assertSame('platform.admin', $payload['scope']);
+        $this->assertSame('platform.inbox', $payload['scope']);
         $this->assertArrayHasKey('jti', $payload);
         $this->assertSame(60, $payload['exp'] - $payload['iat']);
         $this->assertArrayNotHasKey('ui_hide', $payload);
@@ -95,7 +95,7 @@ final class EmbedTest extends TestCase
 
     public function test_ui_hide_keys_are_embedded_when_valid(): void
     {
-        $jwt = $this->embed()->ssoToken($this->user(), Embed::SCOPE_ADMIN, [
+        $jwt = $this->embed()->ssoToken($this->user(), Embed::SCOPE_INBOX, [
             UiHide::AI,
             UiHide::SIDEBAR,
             UiHide::AI, // duplicate — should be de-duped
@@ -108,19 +108,19 @@ final class EmbedTest extends TestCase
     public function test_unknown_ui_hide_key_is_rejected_at_mint_time(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->embed()->ssoToken($this->user(), Embed::SCOPE_ADMIN, ['ai', 'hide_everything']);
+        $this->embed()->ssoToken($this->user(), Embed::SCOPE_INBOX, ['ai', 'hide_everything']);
     }
 
     public function test_sso_ttl_ceiling_is_enforced(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->embed()->ssoToken($this->user(), Embed::SCOPE_ADMIN, [], 301);
+        $this->embed()->ssoToken($this->user(), Embed::SCOPE_INBOX, [], 301);
     }
 
     public function test_session_ttl_ceiling_is_enforced(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->embed()->sessionToken($this->user(), Embed::SCOPE_ADMIN, [], 14401);
+        $this->embed()->sessionToken($this->user(), Embed::SCOPE_INBOX, [], 14401);
     }
 
     public function test_unknown_scope_is_rejected(): void

@@ -42,8 +42,6 @@ final class Embed
 {
     public const SCOPE_INBOX = 'platform.inbox';
 
-    public const SCOPE_ADMIN = 'platform.admin';
-
     /** Server-side ceiling on the one-shot SSO token's lifetime. */
     private const SSO_MAX_TTL = 300;
 
@@ -74,7 +72,7 @@ final class Embed
      */
     public function ssoToken(
         EmbedUser $user,
-        string $scope = self::SCOPE_ADMIN,
+        string $scope = self::SCOPE_INBOX,
         array $uiHide = [],
         int $ttlSeconds = 60,
     ): string {
@@ -92,7 +90,7 @@ final class Embed
     public function ssoUrl(
         EmbedUser $user,
         string $redirectPath = self::DEFAULT_REDIRECT,
-        string $scope = self::SCOPE_ADMIN,
+        string $scope = self::SCOPE_INBOX,
         array $uiHide = [],
         int $ttlSeconds = 60,
     ): string {
@@ -116,7 +114,7 @@ final class Embed
      */
     public function sessionToken(
         EmbedUser $user,
-        string $scope = self::SCOPE_ADMIN,
+        string $scope = self::SCOPE_INBOX,
         array $uiHide = [],
         int $ttlSeconds = self::SESSION_MAX_TTL,
     ): string {
@@ -135,7 +133,7 @@ final class Embed
     public function embedUrl(
         string $path,
         EmbedUser $user,
-        string $scope = self::SCOPE_ADMIN,
+        string $scope = self::SCOPE_INBOX,
         array $uiHide = [],
         int $ttlSeconds = self::SESSION_MAX_TTL,
     ): string {
@@ -184,9 +182,9 @@ final class Embed
      */
     private function encode(EmbedUser $user, string $scope, array $uiHide, int $ttlSeconds): string
     {
-        if (! in_array($scope, [self::SCOPE_INBOX, self::SCOPE_ADMIN], true)) {
+        if ($scope !== self::SCOPE_INBOX) {
             throw new InvalidArgumentException(sprintf(
-                'Unknown scope "%s". Use Embed::SCOPE_INBOX or Embed::SCOPE_ADMIN.',
+                'Unknown scope "%s". Use Embed::SCOPE_INBOX.',
                 $scope,
             ));
         }
