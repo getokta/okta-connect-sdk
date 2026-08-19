@@ -20,7 +20,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class Connection
 {
     /**
-     * @param  list<string>          $abilities
+     * @param  list<string>  $abilities
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -32,8 +32,7 @@ final class Connection
         public readonly ?string $lastUsedAt,
         public readonly ?string $logoUrl = null,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

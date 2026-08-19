@@ -25,8 +25,7 @@ abstract class Resource
 
     public function __construct(
         protected readonly HttpClientInterface $http,
-    ) {
-    }
+    ) {}
 
     /** Prefix a version-less path with the API version, e.g. api('/tickets'). */
     protected function api(string $path): string

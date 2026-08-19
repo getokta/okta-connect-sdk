@@ -14,11 +14,11 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class EmailMessage
 {
     /**
-     * @param  array<int, mixed>|null    $to
-     * @param  array<int, mixed>|null    $cc
-     * @param  array<int, mixed>|null    $bcc
-     * @param  array<string, mixed>|null $error
-     * @param  array<string, mixed>      $extra
+     * @param  array<int, mixed>|null  $to
+     * @param  array<int, mixed>|null  $cc
+     * @param  array<int, mixed>|null  $bcc
+     * @param  array<string, mixed>|null  $error
+     * @param  array<string, mixed>  $extra
      */
     public function __construct(
         public readonly ?string $id,
@@ -37,8 +37,7 @@ final class EmailMessage
         public readonly ?string $deliveredAt,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

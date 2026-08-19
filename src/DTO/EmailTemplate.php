@@ -14,7 +14,7 @@ final class EmailTemplate
 {
     /**
      * @param  array<string, mixed>|null  $variables
-     * @param  array<string, mixed>       $extra
+     * @param  array<string, mixed>  $extra
      */
     public function __construct(
         public readonly ?string $id,
@@ -24,8 +24,7 @@ final class EmailTemplate
         public readonly ?array $variables,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

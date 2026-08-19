@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\Tests\Resources;
 
 use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Exceptions\WhatsAppException;
 use Okta\Connect\WhatsApp\Resources\Webhooks;
 use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
@@ -124,9 +125,9 @@ final class WebhooksTest extends TestCase
         ]);
         $header = 'sha256='.hash_hmac('sha256', $body, $secret);
 
-        $hook = \Okta\Connect\WhatsApp\Resources\Webhooks::parse($body, $header, $secret);
+        $hook = Webhooks::parse($body, $header, $secret);
 
-        $this->assertSame(\Okta\Connect\WhatsApp\Enums\WebhookEvent::MessageSent, $hook->type());
+        $this->assertSame(WebhookEvent::MessageSent, $hook->type());
         $this->assertTrue($hook->isMessageEvent());
         $this->assertSame(42, $hook->organizationId);
         $this->assertSame('01HC', $hook->conversationId());
@@ -138,15 +139,15 @@ final class WebhooksTest extends TestCase
 
     public function test_parse_rejects_a_bad_signature(): void
     {
-        $this->expectException(\Okta\Connect\WhatsApp\Exceptions\WhatsAppException::class);
-        \Okta\Connect\WhatsApp\Resources\Webhooks::parse('{"event":"message.sent"}', 'sha256=bad', 'secret');
+        $this->expectException(WhatsAppException::class);
+        Webhooks::parse('{"event":"message.sent"}', 'sha256=bad', 'secret');
     }
 
     public function test_parse_without_a_secret_skips_verification(): void
     {
-        $hook = \Okta\Connect\WhatsApp\Resources\Webhooks::parse('{"event":"channel.deleted","organization_id":7}');
+        $hook = Webhooks::parse('{"event":"channel.deleted","organization_id":7}');
 
-        $this->assertSame(\Okta\Connect\WhatsApp\Enums\WebhookEvent::ChannelDeleted, $hook->type());
+        $this->assertSame(WebhookEvent::ChannelDeleted, $hook->type());
         $this->assertFalse($hook->isMessageEvent());
         $this->assertNull($hook->conversationId());
     }

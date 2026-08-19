@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\Sso;
 
 use InvalidArgumentException;
+use Okta\Connect\WhatsApp\Embed\Embed;
 
 /**
  * Mints HS256 JWTs accepted by the platform's `/embed/sso` route.
@@ -22,7 +23,7 @@ use InvalidArgumentException;
  * `scope`, `jti`, `iat`, `exp`. Default `iss=okta-web`, `aud=okta-whatsapp`
  * — override only if the platform deployment uses different values.
  *
- * @deprecated since 0.6 — use {@see \Okta\Connect\WhatsApp\Embed\Embed}
+ * @deprecated since 0.6 — use {@see Embed}
  *             (via `Client::embed()`), which covers BOTH the one-shot SSO
  *             handshake and the long-lived cookieless per-request flow,
  *             plus validated `ui_hide` keys and iframe-URL/header helpers.

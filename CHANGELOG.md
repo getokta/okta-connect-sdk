@@ -5,6 +5,62 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] — 2026-08-19
+
+### Added
+- **Partner API client** (`Partner\PartnerClient`) — the surface a technical
+  partner uses to wire Connect into its own product, previously reachable only
+  by hand-rolling HTTP calls after v2.0.0 pointed provisioning at
+  `/api/v1/partner/*`. Covers every endpoint: `me()`, workspaces
+  (create/list/get/update/suspend/activate/`findByExternalId`), members,
+  workspace API tokens, channels, one-time sign-in links, and the embed key.
+  - Token lifetime is handled for you: one client-credentials exchange at a
+    time, a re-exchange before the hour is up, and exactly one retry on a `401`
+    that slips through anyway. `withStaticToken()` for local development.
+  - `workspaces()->create()` returns a `WorkspaceProvision` carrying `created`,
+    because the idempotency contract's answer (201 minted vs 200 matched on
+    `external_id`) is not in the body. `users()->add()` returns a
+    `MembershipResult` for the same reason — a reused account returns no
+    one-time password, and that is success rather than a missing field.
+  - `workspaceClient()` builds a tenant `Client` from a token you just minted;
+    it raises rather than returning a client with no secret when handed a token
+    read back from a list.
+  - `embedSigner()` returns an `Embed` already bound to `partner:{your-ulid}`.
+    Signing as `okta-web` is refused server-side, and the browser renders that
+    refusal as an inbox that silently never signs in.
+- **Embed `workspace` claim** — `EmbedUser` takes an optional organization ulid
+  (plus `inWorkspace()`). Without it, an operator who belongs to several
+  workspaces lands on their oldest membership: deterministic, but not intent.
+  The claim grants nothing; the platform still requires an active membership.
+- **`QrSession::$error`** — the field to branch on while polling
+  (`gateway_unavailable` / `pairing_failed` / `qr_expired` / `disconnected`),
+  with `hasError()` and `isRetryable()`. Only `gateway_unavailable` is worth
+  retrying; the rest need a new session.
+
+### Fixed
+- `QrSession::isTerminal()` now counts `qr_expired`. It was omitted, so a poll
+  loop written against `isTerminal()` waited forever on a code the gateway had
+  stopped regenerating.
+- `QrSession::fromArray()` reads the flat payload shape (`id`, `channel_id`,
+  `status`, `expires_in`) as well as the `channel` envelope. The platform emits
+  both; this SDK declared only the envelope.
+- `HttpClient` no longer sends `Authorization: Bearer` with an empty token. A
+  deliberately unauthenticated client (the credentials exchange, the OAuth
+  handshake) claimed a credential it did not have.
+
+### Changed
+- `DTO\Workspace`, `DTO\WorkspaceUser` and `DTO\WorkspaceToken` now model the
+  Partner API's actual payloads — workspace `status` / `external_id` / `locale`
+  / `timezone` / `plan_key`, membership `status` vs `membership_status`, token
+  `expires_at` / `last_used_at`, and the `one_time_password` that appears
+  exactly once. `WorkspaceToken::$id` reads the identifier from `id` **or**
+  `token_id`; the mint response used one name and the revoke route documented
+  the other, so a client that stored the documented name stored null and could
+  not revoke on rotation. These DTOs were unreachable before this release (no
+  resource returned them), so nothing in a working integration changes.
+- `QrPairing` doc blocks describe the pairing boot as synchronous, which it now
+  is, and name the `422` / `502` failures it can raise.
+
 ## [2.0.0] — 2026-08-18
 
 ### Removed (security hardening) — BREAKING

@@ -20,8 +20,7 @@ final class SocialPostTarget
         public readonly ?string $providerPostId,
         public readonly ?string $publishedAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

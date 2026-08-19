@@ -55,8 +55,7 @@ final class HtmlMessageBuilder implements Stringable
 
     private function __construct(
         private readonly bool $rtl,
-    ) {
-    }
+    ) {}
 
     /**
      * Start a new message. RTL by default (Arabic-first platform) —

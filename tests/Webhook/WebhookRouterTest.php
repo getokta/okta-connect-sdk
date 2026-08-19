@@ -6,6 +6,7 @@ namespace Okta\Connect\WhatsApp\Tests\Webhook;
 
 use Okta\Connect\WhatsApp\DTO\WebhookNotification;
 use Okta\Connect\WhatsApp\Enums\WebhookEvent;
+use Okta\Connect\WhatsApp\Exceptions\WhatsAppException;
 use Okta\Connect\WhatsApp\Webhook\WebhookRouter;
 use PHPUnit\Framework\TestCase;
 
@@ -21,9 +22,15 @@ final class WebhookRouterTest extends TestCase
     {
         $hits = [];
         $router = (new WebhookRouter)
-            ->on(WebhookEvent::MessageSent, function () use (&$hits): void { $hits[] = 'exact'; })
-            ->onMessage(function () use (&$hits): void { $hits[] = 'family'; })
-            ->onAny(function () use (&$hits): void { $hits[] = 'any'; });
+            ->on(WebhookEvent::MessageSent, function () use (&$hits): void {
+                $hits[] = 'exact';
+            })
+            ->onMessage(function () use (&$hits): void {
+                $hits[] = 'family';
+            })
+            ->onAny(function () use (&$hits): void {
+                $hits[] = 'any';
+            });
 
         $hook = $router->dispatch($this->body('message.sent', ['message' => ['body' => 'hi']]));
 
@@ -40,7 +47,9 @@ final class WebhookRouterTest extends TestCase
 
         $seen = null;
         (new WebhookRouter($secret))
-            ->onChannel(function (WebhookNotification $h) use (&$seen): void { $seen = $h->channel()?->type(); })
+            ->onChannel(function (WebhookNotification $h) use (&$seen): void {
+                $seen = $h->channel()?->type();
+            })
             ->dispatch($body, $sig);
 
         $this->assertSame('telegram', $seen);
@@ -48,7 +57,7 @@ final class WebhookRouterTest extends TestCase
 
     public function test_dispatch_throws_on_bad_signature(): void
     {
-        $this->expectException(\Okta\Connect\WhatsApp\Exceptions\WhatsAppException::class);
+        $this->expectException(WhatsAppException::class);
         (new WebhookRouter('sekret'))->dispatch($this->body('message.sent'), 'sha256=bad');
     }
 

@@ -64,12 +64,12 @@ final class Connect
      * Build the consent-screen URL to send the user to.
      *
      * @param  list<string>  $abilities  Subset of read/write/send/webhooks/admin.
-     * @param  string|null   $state      Opaque CSRF token — store it and verify
-     *                                   it on the callback (see handleCallback).
-     * @param  string|null   $logoUrl    Your app's logo, shown on the consent
-     *                                   screen. Must be an https URL; the
-     *                                   platform re-validates and silently drops
-     *                                   anything unsafe (non-https, private host…).
+     * @param  string|null  $state  Opaque CSRF token — store it and verify
+     *                              it on the callback (see handleCallback).
+     * @param  string|null  $logoUrl  Your app's logo, shown on the consent
+     *                                screen. Must be an https URL; the
+     *                                platform re-validates and silently drops
+     *                                anything unsafe (non-https, private host…).
      */
     public function authorizationUrl(
         string $appName,
@@ -113,13 +113,13 @@ final class Connect
     /**
      * Validate the redirect query and exchange the code for an access token.
      *
-     * @param  array<string, mixed>  $query         The callback query params
-     *                                              (e.g. $_GET or $request->query()).
-     * @param  string                $redirectUri   MUST equal the redirect_uri you
-     *                                              authorized with.
-     * @param  string|null           $expectedState The state you generated; when
-     *                                              provided it must match or the
-     *                                              call is rejected as CSRF.
+     * @param  array<string, mixed>  $query  The callback query params
+     *                                       (e.g. $_GET or $request->query()).
+     * @param  string  $redirectUri  MUST equal the redirect_uri you
+     *                               authorized with.
+     * @param  string|null  $expectedState  The state you generated; when
+     *                                      provided it must match or the
+     *                                      call is rejected as CSRF.
      *
      * @throws WhatsAppException When the user denied consent, the state does not
      *                           match, or no code is present.

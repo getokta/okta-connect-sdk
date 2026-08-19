@@ -26,8 +26,7 @@ final class EmailBroadcast
         public readonly ?string $scheduledAt,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

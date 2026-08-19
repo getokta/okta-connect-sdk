@@ -21,9 +21,8 @@ final class Config
         public readonly int $timeout = 30,
         public readonly int $retries = 2,
         public readonly ?ClientInterface $httpClient = null,
-        public readonly string $userAgent = 'okta-connect-sdk-php/0.6',
-    ) {
-    }
+        public readonly string $userAgent = 'okta-connect-sdk-php/2.1',
+    ) {}
 
     /**
      * Return the trimmed base URL (no trailing slash) for path concatenation.

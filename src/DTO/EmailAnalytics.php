@@ -15,7 +15,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class EmailAnalytics
 {
     /**
-     * @param  array<string, mixed>        $summary
+     * @param  array<string, mixed>  $summary
      * @param  list<array<string, mixed>>  $series
      */
     public function __construct(
@@ -23,8 +23,7 @@ final class EmailAnalytics
         public readonly ?string $to,
         public readonly array $summary = [],
         public readonly array $series = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

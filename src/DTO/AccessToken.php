@@ -16,7 +16,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class AccessToken
 {
     /**
-     * @param  list<string>          $abilities
+     * @param  list<string>  $abilities
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -25,8 +25,7 @@ final class AccessToken
         public readonly array $abilities,
         public readonly ?string $expiresAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

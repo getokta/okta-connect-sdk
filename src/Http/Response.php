@@ -15,13 +15,12 @@ use Psr\Http\Message\ResponseInterface;
 final class Response
 {
     /** @var array<string, mixed>|list<mixed>|null */
-    private array|null $decoded = null;
+    private ?array $decoded = null;
 
     public function __construct(
         public readonly ResponseInterface $psrResponse,
         public readonly string $rawBody,
-    ) {
-    }
+    ) {}
 
     public function statusCode(): int
     {

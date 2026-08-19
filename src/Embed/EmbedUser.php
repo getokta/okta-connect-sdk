@@ -18,6 +18,18 @@ use InvalidArgumentException;
  * accidentally transpose positional `email` / `name` arguments — a
  * recurring source of "logged in as the wrong account" bugs when each
  * platform hand-rolled the JWT payload.
+ *
+ * `workspace` answers the question the other three cannot: an operator
+ * who runs several communities is a member of several workspaces, and
+ * without it the session lands on their **oldest** membership. That is
+ * deterministic, so it is never a coin flip — but it is also not
+ * intent. Name the organization ulid whenever the operator has more
+ * than one and you know which one they clicked.
+ *
+ * It grants nothing. The platform still requires the user to be an
+ * active member of that workspace, and (for a partner-bound key) that
+ * the workspace be one the partner manages. The claim picks between
+ * doors the user can already open; it does not open one.
  */
 final readonly class EmbedUser
 {
@@ -25,9 +37,22 @@ final readonly class EmbedUser
         public string $sub,
         public string $email,
         public string $name = '',
+        public ?string $workspace = null,
     ) {
         if ($sub === '' || $email === '') {
             throw new InvalidArgumentException('EmbedUser requires a non-empty sub and email.');
         }
+
+        if ($workspace !== null && trim($workspace) === '') {
+            throw new InvalidArgumentException(
+                'EmbedUser workspace must be an organization ulid, or null to let the platform choose.',
+            );
+        }
+    }
+
+    /** The same operator, pinned to a different workspace. */
+    public function inWorkspace(?string $workspace): self
+    {
+        return new self($this->sub, $this->email, $this->name, $workspace);
     }
 }

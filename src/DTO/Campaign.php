@@ -34,8 +34,7 @@ final class Campaign
         public readonly ?string $finishedAt,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

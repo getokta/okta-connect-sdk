@@ -13,8 +13,7 @@ final readonly class WhatsAppGroupParticipant
         public ?string $avatarUrl,
         public string $role,
         public ?string $joinedAt,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -45,7 +45,7 @@ final class Messages extends Resource
      * contact + conversation if needed.
      *
      * @param  string  $channelId  The channel ULID to send from.
-     * @param  string  $waId       Destination number in E.164 without a leading `+` (e.g. 966500000000).
+     * @param  string  $waId  Destination number in E.164 without a leading `+` (e.g. 966500000000).
      */
     public function sendText(string $channelId, string $waId, string $body, ?string $idempotencyKey = null): Message
     {

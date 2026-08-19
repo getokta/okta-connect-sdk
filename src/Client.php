@@ -40,19 +40,33 @@ final class Client
     private readonly string $baseUrl;
 
     private ?Messages $messages = null;
+
     private ?Conversations $conversations = null;
+
     private ?Contacts $contacts = null;
+
     private ?Channels $channels = null;
+
     private ?Webhooks $webhooks = null;
+
     private ?Templates $templates = null;
+
     private ?Meta $meta = null;
+
     private ?QrPairing $qr = null;
+
     private ?Groups $groups = null;
+
     private ?Emails $emails = null;
+
     private ?SocialPosts $socialPosts = null;
+
     private ?Campaigns $campaigns = null;
+
     private ?Tickets $tickets = null;
+
     private ?Tags $tags = null;
+
     private ?Analytics $analytics = null;
 
     /**
@@ -70,7 +84,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.9',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/2.1',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);

@@ -67,7 +67,7 @@ final class HttpClient implements HttpClientInterface
 
     /**
      * @param  array<string, mixed>|null  $body
-     * @param  array<string, string>      $headers
+     * @param  array<string, string>  $headers
      */
     private function send(string $method, string $url, ?array $body, array $headers): Response
     {
@@ -201,11 +201,20 @@ final class HttpClient implements HttpClientInterface
      */
     private function defaultHeaders(): array
     {
-        return [
-            'Authorization' => 'Bearer '.$this->config->token,
+        $headers = [
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
             'User-Agent' => $this->config->userAgent,
         ];
+
+        // An empty token means this client is deliberately unauthenticated —
+        // the client-credentials exchange, the OAuth handshake. Sending a
+        // bare `Bearer` there claims a credential we do not have, and some
+        // gateways reject the malformed header before the route ever sees it.
+        if ($this->config->token !== '') {
+            $headers['Authorization'] = 'Bearer '.$this->config->token;
+        }
+
+        return $headers;
     }
 }

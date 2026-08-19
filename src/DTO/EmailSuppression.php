@@ -21,8 +21,7 @@ final class EmailSuppression
         public readonly ?string $reason,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -18,8 +18,7 @@ final readonly class MetaConfig
         public string $graphVersion,
         public string $signupMode,
         public bool $available,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

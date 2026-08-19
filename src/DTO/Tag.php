@@ -17,8 +17,7 @@ final class Tag
         public readonly ?string $scope,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

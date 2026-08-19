@@ -38,8 +38,7 @@ final class WebhookNotification
         public readonly array $payload,
         public readonly ?string $deliveryId,
         public readonly ?string $sentAt,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data  The decoded top-level envelope.

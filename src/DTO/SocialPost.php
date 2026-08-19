@@ -31,8 +31,7 @@ final class SocialPost
         public readonly ?string $createdAt,
         public readonly array $targets = [],
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data
