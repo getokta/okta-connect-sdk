@@ -37,6 +37,15 @@ use InvalidArgumentException;
  * Both flows accept the same `ui_hide` list (see {@see UiHide}); keys
  * are validated at mint time so a typo fails loudly here instead of
  * silently leaving a control visible in the iframe.
+ *
+ * Both also carry {@see EmbedUser::$workspace} through as the `workspace`
+ * claim, which is how an operator who belongs to several workspaces lands
+ * on the intended one rather than their oldest membership.
+ *
+ * Partners: construct with **your** issuer, `partner:{your-ulid}` — or let
+ * {@see \Okta\Connect\WhatsApp\Partner\PartnerClient::embedSigner()} derive
+ * it. A token signed under the wrong issuer is refused server-side, and the
+ * browser renders that as an inbox that silently never signs in.
  */
 final class Embed
 {
@@ -206,6 +215,13 @@ final class Embed
 
         if ($cleanUiHide !== []) {
             $payload['ui_hide'] = $cleanUiHide;
+        }
+
+        // Which workspace the session lands on. Omitted, the platform picks
+        // the user's oldest matching membership — fine for an operator who
+        // runs one, guesswork for an operator who runs several.
+        if ($user->workspace !== null) {
+            $payload['workspace'] = $user->workspace;
         }
 
         $header = $this->b64('{"alg":"HS256","typ":"JWT"}');

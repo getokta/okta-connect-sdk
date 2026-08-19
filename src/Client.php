@@ -70,7 +70,7 @@ final class Client
             timeout: $options['timeout'] ?? 30,
             retries: $options['retries'] ?? 2,
             httpClient: $options['httpClient'] ?? null,
-            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/0.9',
+            userAgent: $options['userAgent'] ?? 'okta-connect-sdk-php/2.1',
         );
 
         $this->http = $httpClient ?? new HttpClient($config);

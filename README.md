@@ -313,6 +313,142 @@ $ssoUrl = $embed->ssoUrl($operator, redirectPath: '/app/inbox?embedded=1');
 Unknown `ui_hide` keys and out-of-range TTLs throw at mint time, so misconfigured
 embeds fail loudly here instead of silently in the browser.
 
+**Which workspace does the session land on?** An operator who belongs to several
+workspaces lands on their *oldest* membership unless you say otherwise. Name one:
+
+```php
+$operator = new EmbedUser(
+    sub: 'partner-user-7',
+    email: 'op@acme.com',
+    name: 'Op',
+    workspace: $workspaceUlid,   // rides along as the `workspace` claim
+);
+```
+
+It grants nothing — the platform still requires an active membership. The claim
+picks between doors the user can already open.
+
+**Technical partners:** sign with *your* issuer (`partner:{your-ulid}`), not
+`okta-web`. `PartnerClient::embedSigner()` derives it for you — see below.
+
+### Partner API (technical partners)
+
+A **technical partner** (شريك تقني) wires Connect into its own product: it
+provisions workspaces, manages their people, mints tokens for them, reserves
+channels and drops users into the dashboard — all with its own key pair.
+
+`PartnerClient` is deliberately a separate object from `Client`. A partner token
+is bound to the partner organization rather than to a tenant, lives in its own
+store, and is rejected by the tenant API exactly as a tenant token is rejected
+here. One object per credential keeps that boundary visible instead of turning it
+into a 401 that reads like a bug.
+
+```php
+use Okta\Connect\WhatsApp\Partner\PartnerClient;
+
+$partner = PartnerClient::withKeyPair(
+    'https://connect.getokta.io',
+    $clientId,
+    $clientSecret,
+);
+
+// Prove the key is live before a provisioning run half-completes.
+$me = $partner->me();
+$me->can('workspaces.write');   // → bool
+
+// Idempotent on external_id: a retry after a timeout matches instead of
+// minting a duplicate, and says which happened.
+$result = $partner->workspaces()->create([
+    'name'        => 'Acme Support',
+    'external_id' => 'acct_8891',
+    'locale'      => 'ar',
+    'owner'       => ['name' => 'Sara', 'email' => 'sara@acme.test', 'password_auto' => true],
+]);
+
+$result->created;               // false on a repeat
+$result->oneTimePassword();     // shown once, on creation only
+
+// Membership — an email Connect already knows is reused, never overwritten.
+$member = $partner->users()->add($result->workspace->id, [
+    'name' => 'Khalid', 'email' => 'khalid@acme.test', 'role' => 'agent', 'password_auto' => true,
+]);
+
+// A tenant token for that workspace's own data plane…
+$token = $partner->tokens()->create(
+    $result->workspace->id,
+    'Acme product sync',
+    $member->user->id,
+    ['read', 'send'],
+);
+
+// …and a client that uses it. `admin` is not mintable here, by design.
+$workspace = $partner->workspaceClient($token);
+$workspace->contacts()->list();
+
+// Drop an existing member straight into the dashboard. Single-use, 5 minutes,
+// membership re-checked at redemption.
+$link = $partner->sso()->issue($result->workspace->id, $member->user->id, '/app/inbox');
+```
+
+Tokens live one hour and are exchanged, refreshed and retried for you: one
+exchange at a time, a re-exchange before expiry, and exactly one retry on a 401
+that slips through anyway. For local development, `PartnerClient::withStaticToken()`
+uses the long-lived token from `/app/partner` verbatim.
+
+#### Embedding, as a partner
+
+Your own signing key and framing allowlist, both self-service:
+
+```php
+$secret = $partner->embed()->issueSecret(['https://mygurb.com', 'https://*.mygurb.com']);
+$secret->secret;    // returned exactly once
+
+// Check what the platform refused: an origin that did not parse fails later as a
+// blank iframe with a 200 and no failed request.
+$origins = $partner->embed()->setOrigins(['https://mygurb.com', 'https://inbox.customer.example']);
+$origins->rejected;
+
+// A signer already wired to partner:{your-ulid} — the issuer is derived, not typed.
+$embed = $partner->embedSigner($secret->secret);
+$src = $embed->inboxUrl(new EmbedUser('gurb-1', 'op@mygurb.test', 'Op', $workspaceUlid));
+```
+
+A token signed with a partner key resolves **only** to a user who already exists
+and is an active member of a workspace you manage. It cannot create an account,
+grant a role, or name anyone else's workspace.
+
+Full reference: the platform's `docs/PARTNER_API.md`.
+
+### WhatsApp QR pairing
+
+Pairing runs with a **workspace** token (the kind `tokens()->create()` mints),
+because the channel belongs to the workspace, not to the partner.
+
+```php
+$session = $workspace->qr()->start('Community line');
+
+do {
+    sleep(3);
+    $session = $workspace->qr()->status($session->id);
+
+    if ($session->hasError()) {
+        // gateway_unavailable is worth retrying; pairing_failed and qr_expired
+        // need a NEW session, and disconnected means it linked and dropped.
+        if (! $session->isRetryable()) {
+            break;
+        }
+    }
+
+    // $session->qr is the string to render; $session->qrTtlSeconds the countdown.
+} while (! $session->isTerminal());
+```
+
+Branch on `error`, not on elapsed time. `start()` boots the gateway session inside
+the request, so it raises on `502 gateway_unavailable` instead of handing back a
+row that would sit at `pending` forever; `422 channel_type_unavailable` means the
+operator has not enabled the `baileys` channel type for that workspace (an
+availability switch, not a billing one).
+
 ### Webhooks
 
 Register outbound webhooks over the API instead of adding them by hand in the
