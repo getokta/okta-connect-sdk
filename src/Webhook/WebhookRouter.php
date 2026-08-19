@@ -34,9 +34,7 @@ final class WebhookRouter
      *                               throws on a bad signature. Omit only when
      *                               you verify out of band.
      */
-    public function __construct(private readonly ?string $secret = null)
-    {
-    }
+    public function __construct(private readonly ?string $secret = null) {}
 
     /**
      * @param  callable(WebhookNotification): mixed  $handler

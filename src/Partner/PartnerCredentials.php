@@ -31,8 +31,7 @@ final class PartnerCredentials
         public readonly ?string $clientSecret,
         public readonly ?string $staticToken,
         public readonly ?array $abilities,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  list<string>|null  $abilities  Narrow the exchanged token; never widens.

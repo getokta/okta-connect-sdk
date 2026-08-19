@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace Okta\Connect\WhatsApp\Tests\Partner;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use Okta\Connect\WhatsApp\Exceptions\AuthenticationException;
+use Okta\Connect\WhatsApp\Partner\PartnerClient;
 use Okta\Connect\WhatsApp\Tests\Fixtures\ResponseFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -120,7 +126,7 @@ final class PartnerTransportTest extends TestCase
     public function test_it_narrows_the_exchanged_token_when_abilities_are_named(): void
     {
         $history = [];
-        $partner = \Okta\Connect\WhatsApp\Partner\PartnerClient::withKeyPair(
+        $partner = PartnerClient::withKeyPair(
             'https://wa.example.com',
             'okc_ci_test',
             'okc_cs_test',
@@ -140,14 +146,14 @@ final class PartnerTransportTest extends TestCase
     }
 
     /**
-     * @param  list<\GuzzleHttp\Psr7\Response>   $queue
+     * @param  list<Response>  $queue
      * @param  array<int, array<string, mixed>>  $history
      */
-    private static function guzzleFor(array $queue, array &$history): \GuzzleHttp\Client
+    private static function guzzleFor(array $queue, array &$history): Client
     {
-        $stack = \GuzzleHttp\HandlerStack::create(new \GuzzleHttp\Handler\MockHandler($queue));
-        $stack->push(\GuzzleHttp\Middleware::history($history));
+        $stack = HandlerStack::create(new MockHandler($queue));
+        $stack->push(Middleware::history($history));
 
-        return new \GuzzleHttp\Client(['handler' => $stack, 'http_errors' => false]);
+        return new Client(['handler' => $stack, 'http_errors' => false]);
     }
 }

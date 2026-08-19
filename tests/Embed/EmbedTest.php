@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\Tests\Embed;
 
 use InvalidArgumentException;
+use Okta\Connect\WhatsApp\Client;
 use Okta\Connect\WhatsApp\Embed\Embed;
 use Okta\Connect\WhatsApp\Embed\EmbedUser;
 use Okta\Connect\WhatsApp\Embed\UiHide;
@@ -148,7 +149,7 @@ final class EmbedTest extends TestCase
 
     public function test_client_embed_factory_uses_configured_base_url(): void
     {
-        $client = new \Okta\Connect\WhatsApp\Client('https://tenant.example.com', 'api-token');
+        $client = new Client('https://tenant.example.com', 'api-token');
         $url = $client->embed(self::SECRET)->ssoUrl($this->user());
 
         $this->assertStringStartsWith('https://tenant.example.com/embed/sso?token=', $url);

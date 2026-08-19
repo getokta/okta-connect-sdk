@@ -24,8 +24,7 @@ final class Ticket
         public readonly ?string $closedAt,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

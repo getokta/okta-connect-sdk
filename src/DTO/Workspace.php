@@ -16,7 +16,7 @@ final class Workspace
 {
     /**
      * @param  array<string, mixed>|null  $metadata
-     * @param  array<string, mixed>       $extra
+     * @param  array<string, mixed>  $extra
      */
     public function __construct(
         public readonly ?string $id,
@@ -34,8 +34,7 @@ final class Workspace
         public readonly ?string $createdAt,
         public readonly ?string $updatedAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

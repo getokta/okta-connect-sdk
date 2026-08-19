@@ -16,14 +16,13 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class EmbedOrigins
 {
     /**
-     * @param  list<string>  $origins   What the platform stored.
+     * @param  list<string>  $origins  What the platform stored.
      * @param  list<string>  $rejected  What it refused to store, verbatim.
      */
     public function __construct(
         public readonly array $origins,
         public readonly array $rejected = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

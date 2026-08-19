@@ -21,8 +21,7 @@ final class SsoLink
         public readonly string $url,
         public readonly ?int $expiresIn,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

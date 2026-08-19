@@ -10,6 +10,7 @@ use Okta\Connect\WhatsApp\Exceptions\AuthenticationException;
 use Okta\Connect\WhatsApp\Http\HttpClient;
 use Okta\Connect\WhatsApp\Http\HttpClientInterface;
 use Okta\Connect\WhatsApp\Http\Response;
+use Psr\Http\Client\ClientInterface;
 
 /**
  * The transport every Partner API call goes through: an HttpClientInterface
@@ -53,9 +54,9 @@ final class PartnerTransport implements HttpClientInterface
     private bool $exchanging = false;
 
     /**
-     * @param  array{timeout?: int, retries?: int, httpClient?: \Psr\Http\Client\ClientInterface, userAgent?: string}  $options
+     * @param  array{timeout?: int, retries?: int, httpClient?: ClientInterface, userAgent?: string}  $options
      * @param  HttpClientInterface|null  $override  Test seam: used verbatim for
-     *                                             every call, token included.
+     *                                              every call, token included.
      */
     public function __construct(
         private readonly string $baseUrl,

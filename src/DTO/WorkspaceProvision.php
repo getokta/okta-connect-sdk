@@ -21,8 +21,7 @@ final class WorkspaceProvision
         public readonly Workspace $workspace,
         public readonly bool $created,
         public readonly ?WorkspaceUser $owner = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $payload

@@ -24,8 +24,7 @@ final readonly class TransactionalMessage
         public ?string $channelId,
         public ?string $createdAt,
         public array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

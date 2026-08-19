@@ -15,7 +15,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final readonly class Template
 {
     /**
-     * @param  list<mixed>|null      $buttons
+     * @param  list<mixed>|null  $buttons
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -31,8 +31,7 @@ final readonly class Template
         public ?array $buttons,
         public ?string $createdAt,
         public array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\Embed;
 
 use InvalidArgumentException;
+use Okta\Connect\WhatsApp\Partner\PartnerClient;
 
 /**
  * One place for everything an integrating platform needs to embed the
@@ -43,7 +44,7 @@ use InvalidArgumentException;
  * on the intended one rather than their oldest membership.
  *
  * Partners: construct with **your** issuer, `partner:{your-ulid}` — or let
- * {@see \Okta\Connect\WhatsApp\Partner\PartnerClient::embedSigner()} derive
+ * {@see PartnerClient::embedSigner()} derive
  * it. A token signed under the wrong issuer is refused server-side, and the
  * browser renders that as an inbox that silently never signs in.
  */

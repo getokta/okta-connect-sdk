@@ -16,8 +16,7 @@ final class Contact
         public readonly ?string $email,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

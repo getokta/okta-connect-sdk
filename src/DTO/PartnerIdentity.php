@@ -14,7 +14,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class PartnerIdentity
 {
     /**
-     * @param  list<string>          $abilities
+     * @param  list<string>  $abilities
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -28,8 +28,7 @@ final class PartnerIdentity
         public readonly ?string $tokenExpiresAt,
         public readonly ?int $workspacesCount,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

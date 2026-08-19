@@ -67,7 +67,7 @@ final class HttpClient implements HttpClientInterface
 
     /**
      * @param  array<string, mixed>|null  $body
-     * @param  array<string, string>      $headers
+     * @param  array<string, string>  $headers
      */
     private function send(string $method, string $url, ?array $body, array $headers): Response
     {

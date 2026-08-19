@@ -16,7 +16,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class EmbedConfig
 {
     /**
-     * @param  list<string>          $origins
+     * @param  list<string>  $origins
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -27,8 +27,7 @@ final class EmbedConfig
         public readonly array $origins,
         public readonly ?string $issuedAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

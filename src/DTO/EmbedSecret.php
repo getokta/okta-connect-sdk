@@ -15,7 +15,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class EmbedSecret
 {
     /**
-     * @param  list<string>          $origins
+     * @param  list<string>  $origins
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -25,8 +25,7 @@ final class EmbedSecret
         public readonly ?string $audience,
         public readonly array $origins,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

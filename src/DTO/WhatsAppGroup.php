@@ -25,8 +25,7 @@ final readonly class WhatsAppGroup
         public ?int $channelId,
         public ?string $joinedAt,
         public array $participants = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

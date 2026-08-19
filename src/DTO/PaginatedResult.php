@@ -19,27 +19,28 @@ use Traversable;
  * }
  *
  * @template TItem
+ *
  * @implements IteratorAggregate<int, TItem>
  */
 final class PaginatedResult implements Countable, IteratorAggregate
 {
     /**
-     * @param  list<TItem>             $items
-     * @param  array<string, mixed>    $links
-     * @param  array<string, mixed>    $meta
+     * @param  list<TItem>  $items
+     * @param  array<string, mixed>  $links
+     * @param  array<string, mixed>  $meta
      */
     public function __construct(
         private readonly array $items,
         private readonly array $links = [],
         private readonly array $meta = [],
-    ) {
-    }
+    ) {}
 
     /**
      * Build from a raw decoded JSON response and a per-item DTO factory.
      *
      * @template TOut
-     * @param  array<string, mixed>            $payload
+     *
+     * @param  array<string, mixed>  $payload
      * @param  callable(array<string, mixed>): TOut  $factory
      * @return self<TOut>
      */

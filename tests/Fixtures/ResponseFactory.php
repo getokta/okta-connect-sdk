@@ -20,8 +20,8 @@ use Okta\Connect\WhatsApp\Partner\PartnerClient;
 final class ResponseFactory
 {
     /**
-     * @param  list<Response>                       $queue
-     * @param  array<int, array<string, mixed>>     $history Reference; appended to per request.
+     * @param  list<Response>  $queue
+     * @param  array<int, array<string, mixed>>  $history  Reference; appended to per request.
      */
     public static function makeClient(array $queue, array &$history = []): Client
     {
@@ -52,7 +52,7 @@ final class ResponseFactory
      * exchange, the refresh and the Authorization header it attaches are all
      * exercised for real — those are the parts worth testing.
      *
-     * @param  list<Response>                    $queue
+     * @param  list<Response>  $queue
      * @param  array<int, array<string, mixed>>  $history  Reference; appended to per request.
      */
     public static function makePartnerClient(

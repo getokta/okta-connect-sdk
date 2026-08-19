@@ -23,8 +23,7 @@ final class PartnerAccessToken
         public readonly ?int $expiresIn,
         public readonly ?string $expiresAt,
         public readonly array $abilities = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -36,8 +36,7 @@ final class QrSession
         public readonly ?string $qr,
         public readonly ?int $qrTtlSeconds,
         public readonly ?string $error = null,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

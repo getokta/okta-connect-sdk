@@ -19,8 +19,7 @@ final class AnalyticsMetrics
         public readonly ?string $to,
         public readonly ?string $platform,
         public readonly array $metrics,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data  The `data` object of the response.

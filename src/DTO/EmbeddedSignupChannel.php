@@ -15,8 +15,7 @@ final readonly class EmbeddedSignupChannel
         public string $phoneNumber,
         public string $phoneNumberId,
         public string $verifiedName,
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

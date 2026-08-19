@@ -23,7 +23,7 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class WorkspaceToken
 {
     /**
-     * @param  list<string>          $abilities
+     * @param  list<string>  $abilities
      * @param  array<string, mixed>  $extra
      */
     public function __construct(
@@ -36,8 +36,7 @@ final class WorkspaceToken
         public readonly ?string $lastUsedAt,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Okta\Connect\WhatsApp\Resources\Integrations;
 
 use Okta\Connect\WhatsApp\DTO\QrSession;
+use Okta\Connect\WhatsApp\Exceptions\ServerException;
+use Okta\Connect\WhatsApp\Exceptions\ValidationException;
 use Okta\Connect\WhatsApp\Resources\Resource;
 
 /**
@@ -34,13 +36,13 @@ final class QrPairing extends Resource
     /**
      * Create a pairing session.
      *
-     * @throws \Okta\Connect\WhatsApp\Exceptions\ValidationException `422
-     *         channel_type_unavailable` — the operator has not enabled the
-     *         `baileys` channel type for this workspace. It is an
-     *         availability switch, not a billing one: no plan or paid
-     *         subscription is involved.
-     * @throws \Okta\Connect\WhatsApp\Exceptions\ServerException `502
-     *         gateway_unavailable` — the pairing gateway refused the boot.
+     * @throws ValidationException `422
+     *                             channel_type_unavailable` — the operator has not enabled the
+     *                             `baileys` channel type for this workspace. It is an
+     *                             availability switch, not a billing one: no plan or paid
+     *                             subscription is involved.
+     * @throws ServerException `502
+     *                         gateway_unavailable` — the pairing gateway refused the boot.
      */
     public function start(string $displayName, ?string $idempotencyKey = null): QrSession
     {

@@ -7,8 +7,8 @@ namespace Okta\Connect\WhatsApp\DTO;
 final class Webhook
 {
     /**
-     * @param  list<string>            $events
-     * @param  array<string, mixed>    $extra
+     * @param  list<string>  $events
+     * @param  array<string, mixed>  $extra
      */
     public function __construct(
         public readonly ?string $id,
@@ -20,8 +20,7 @@ final class Webhook
         public readonly ?string $secret,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
-    ) {
-    }
+    ) {}
 
     /**
      * @param  array<string, mixed>  $data

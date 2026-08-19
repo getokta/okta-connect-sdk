@@ -9,6 +9,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Okta\Connect\WhatsApp\Client;
 use Okta\Connect\WhatsApp\Config;
 use Okta\Connect\WhatsApp\Connect\Connect;
 use Okta\Connect\WhatsApp\DTO\AccessToken;
@@ -19,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 final class ConnectTest extends TestCase
 {
     /**
-     * @param  list<GuzzleResponse>              $queue
+     * @param  list<GuzzleResponse>  $queue
      * @param  array<int, array<string, mixed>>  $history
      */
     private function connect(array $queue = [], array &$history = []): Connect
@@ -211,6 +212,6 @@ final class ConnectTest extends TestCase
 
     public function test_client_connect_factory_returns_connect(): void
     {
-        $this->assertInstanceOf(Connect::class, \Okta\Connect\WhatsApp\Client::connect('https://connect.getokta.io'));
+        $this->assertInstanceOf(Connect::class, Client::connect('https://connect.getokta.io'));
     }
 }

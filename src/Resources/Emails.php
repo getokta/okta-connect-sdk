@@ -63,7 +63,7 @@ final class Emails extends Resource
      *
      * `$overrides` merges into the payload (cc/bcc/reply_to/text/headers).
      *
-     * @param  list<string>|string   $to
+     * @param  list<string>|string  $to
      * @param  array<string, mixed>  $overrides
      */
     public function sendHtml(
@@ -86,7 +86,7 @@ final class Emails extends Resource
      * Convenience: send a stored template to one or more recipients,
      * merging `$overrides` (which may add cc/bcc/reply_to/subject).
      *
-     * @param  list<string>          $to
+     * @param  list<string>  $to
      * @param  array<string, mixed>  $variables
      * @param  array<string, mixed>  $overrides
      */

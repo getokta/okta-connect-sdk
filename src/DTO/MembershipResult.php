@@ -18,8 +18,7 @@ final class MembershipResult
     public function __construct(
         public readonly WorkspaceUser $user,
         public readonly bool $created,
-    ) {
-    }
+    ) {}
 
     /** The generated password, when one was generated. Shown once, never again. */
     public function oneTimePassword(): ?string
