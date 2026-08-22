@@ -231,7 +231,7 @@ final class PartnerTransport implements HttpClientInterface
             timeout: $this->options['timeout'] ?? 30,
             retries: $this->options['retries'] ?? 2,
             httpClient: $this->options['httpClient'] ?? null,
-            userAgent: $this->options['userAgent'] ?? 'okta-connect-sdk-php/2.1',
+            userAgent: $this->options['userAgent'] ?? 'okta-connect-sdk-php/2.2',
         ));
     }
 }

@@ -27,7 +27,8 @@ use Okta\Connect\WhatsApp\Resources\Resource;
  *   4. Partner UI calls `$client->meta()->completeEmbeddedSignup($code, $wabaId)`
  *      and the platform exchanges the code for a system-user token,
  *      registers the phone number, and creates a Channel row in the
- *      workspace's organization.
+ *      workspace's organization. Missed the postMessage? Call it with
+ *      an empty `$wabaId` — the platform reads the id off the token.
  *
  * Auth: tenant-scope Sanctum token (workspace's `access_token`).
  */
@@ -43,9 +44,18 @@ final class Meta extends Resource
     /**
      * Finalise an Embedded Signup session.
      *
+     * `$wabaId` comes from Meta's `WA_EMBEDDED_SIGNUP` postMessage — which is
+     * delivered to the browser once, with no second chance: a blocked frame,
+     * a restored tab, or a completion event name Meta added later loses it
+     * permanently. Since platform 2026-08 you may pass an EMPTY string in
+     * that case: the platform derives the WABA id from the exchanged token
+     * itself (`debug_token` granular scopes) instead of failing a signup the
+     * operator already completed. Pass the id when you have it — that skips
+     * the extra lookup.
+     *
      * @return list<EmbeddedSignupChannel>
      */
-    public function completeEmbeddedSignup(string $code, string $wabaId, ?string $idempotencyKey = null): array
+    public function completeEmbeddedSignup(string $code, string $wabaId = '', ?string $idempotencyKey = null): array
     {
         $response = $this->http->post(
             '/api/integrations/meta/embedded-signup',
