@@ -132,6 +132,70 @@ final class TemplatesTest extends TestCase
         $this->assertNull($body['group']);
     }
 
+    public function test_save_sends_buttons_and_maps_them_on_the_template(): void
+    {
+        $buttons = [
+            ['type' => 'QUICK_REPLY', 'text' => 'Confirm'],
+            ['type' => 'URL', 'text' => 'Track', 'url' => 'https://example.com/t/1'],
+            ['type' => 'PHONE_NUMBER', 'text' => 'Call us', 'phone_number' => '+966500000000'],
+        ];
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(201, ['data' => ['id' => 't_1', 'name' => 'notice', 'buttons' => $buttons]]),
+        ], $history);
+
+        $template = $client->templates()->save([
+            'name' => 'notice',
+            'language' => 'ar',
+            'body_text' => 'Hello {{1}}, thanks for your order.',
+            'buttons' => $buttons,
+        ]);
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+        $this->assertSame($buttons, $body['buttons']);
+        $this->assertSame($buttons, $template->buttons);
+        $this->assertSame('https://example.com/t/1', $template->buttons[1]['url'] ?? null);
+        $this->assertSame($buttons, $template->toArray()['buttons']);
+    }
+
+    public function test_save_without_buttons_leaves_the_key_out_so_stored_ones_are_kept(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['data' => ['id' => 't_1', 'buttons' => [['type' => 'QUICK_REPLY', 'text' => 'Ok']]]]),
+        ], $history);
+
+        $template = $client->templates()->save([
+            'name' => 'notice',
+            'language' => 'ar',
+            'body_text' => 'Hello {{1}}, thanks for your order.',
+        ]);
+
+        $body = json_decode((string) $history[0]['request']->getBody(), true);
+        $this->assertArrayNotHasKey('buttons', $body);
+        $this->assertSame([['type' => 'QUICK_REPLY', 'text' => 'Ok']], $template->buttons);
+    }
+
+    public function test_save_with_an_empty_button_list_sends_it_to_clear_them(): void
+    {
+        $history = [];
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, ['data' => ['id' => 't_1', 'buttons' => null]]),
+        ], $history);
+
+        $template = $client->templates()->save([
+            'name' => 'notice',
+            'language' => 'ar',
+            'body_text' => 'Hello {{1}}, thanks for your order.',
+            'buttons' => [],
+        ]);
+
+        $raw = (string) $history[0]['request']->getBody();
+        $this->assertStringContainsString('"buttons":[]', $raw);
+        $this->assertSame([], json_decode($raw, true)['buttons']);
+        $this->assertNull($template->buttons);
+    }
+
     public function test_submit_posts_the_optional_channel(): void
     {
         $history = [];

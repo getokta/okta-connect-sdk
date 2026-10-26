@@ -82,10 +82,29 @@ final class Templates extends Resource
      * Re-posting an existing (`name`, `language`) pair updates that template.
      * Body: `name`, `language`, `body_text` (required); `category`,
      * `channel_id`, `header_type`, `header_text`, `footer_text`,
-     * `example_variables` (one per `{{N}}`), `group`. Omit `group` to keep
-     * the current folder; pass null or '' to clear it.
+     * `example_variables` (one per `{{N}}`), `group`, `buttons`. Omit
+     * `group` to keep the current folder; pass null or '' to clear it.
      *
-     * @param  array<string, mixed>  $payload
+     * `buttons`: up to 3 of `['type' => 'QUICK_REPLY'|'URL'|'PHONE_NUMBER',
+     * 'text' => ≤25 chars]`, plus `url` for URL and `phone_number` for
+     * PHONE_NUMBER. Same rule as `group`: omit the key to keep the buttons
+     * already stored (e.g. added in the dashboard); pass `[]` or null to
+     * remove them. The payload is sent as given, so an absent key stays absent.
+     *
+     * @param  array{
+     *     name: string,
+     *     language: string,
+     *     body_text: string,
+     *     category?: string,
+     *     channel_id?: string|null,
+     *     header_type?: string|null,
+     *     header_text?: string|null,
+     *     footer_text?: string|null,
+     *     example_variables?: list<string>|null,
+     *     group?: string|null,
+     *     buttons?: list<array{type: 'QUICK_REPLY'|'URL'|'PHONE_NUMBER', text: string, url?: string, phone_number?: string}>|null,
+     *     ...
+     * }  $payload
      */
     public function save(array $payload): Template
     {

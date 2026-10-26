@@ -21,10 +21,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   `POST /api/v1/templates`), `submit($ulid, ?$channelId)` and `delete($ulid)`.
   These endpoints already existed on the platform; the SDK had no wrapper.
   `save()` takes `group`: omit it to keep the folder, null or '' to clear it.
+- **Template buttons** — `save()` takes `buttons`: up to 3 of
+  `['type' => 'QUICK_REPLY'|'URL'|'PHONE_NUMBER', 'text' => ≤25]`, with `url`
+  (URL) or `phone_number` (PHONE_NUMBER). Same rule as `group`: omit the key
+  to keep the stored buttons (e.g. ones added in the dashboard), pass `[]` or
+  null to remove them. The SDK never defaults it, so an older call that does
+  not send `buttons` no longer risks wiping them.
 - `templates()->list()` documents the `category`, `group` and `preset_key`
   filters.
 - `Template` gains `group`, `presetKey`, `channelId` and `exampleVariables`
-  (+ `isFromPreset()`). `channelId` is the channel to submit through;
+  (+ `isFromPreset()`), and `buttons` is now typed as
+  `list<array{type, text, url?, phone_number?}>|null`. `channelId` is the channel to submit through;
   `exampleVariables` must go back with any edit.
 - `Channel` gains `supportsTemplates` and `wabaId`, so a client can choose a
   template-capable channel instead of guessing (a QR-paired number has no
