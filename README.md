@@ -77,6 +77,42 @@ $client->templates()->send([
     'variables'     => ['12345', '120 SAR'],
 ]);
 
+// Template authoring (`write` token — never `send`). Filters on list():
+// status, language, category, group (your folder), preset_key.
+$tpl = $client->templates()->save([
+    'name'              => 'order_ready',
+    'language'          => 'ar',
+    'body_text'         => 'مرحباً {{1}}، طلبك رقم {{2}} جاهز للاستلام.',
+    'example_variables' => ['سارة', '12345'],  // one per {{N}} — Meta requires them
+    'group'             => 'Orders',            // omit = keep; null / '' = clear
+]);
+$client->templates()->submit($tpl->id);         // through the template's own WABA
+$client->templates()->delete($tpl->id);
+
+// Pick a channel that can carry templates instead of guessing
+$official = array_filter(
+    $client->channels()->whatsapp('connected')->items(),
+    fn ($ch) => $ch->supportsTemplates === true,
+);
+
+// Template library — ready-made wording that passes Meta's review rules
+$presets = $client->templates()->presets(['category' => 'utility', 'group' => 'commerce', 'language' => 'ar']);
+foreach ($presets as $preset) {
+    echo $preset->title, ': ', $preset->variant('ar')?->bodyText, PHP_EOL;
+}
+
+// Copy one into the workspace as a draft, optionally submitting it at once.
+// The template is created even if submission fails — check the result.
+$result = $client->templates()->createFromPreset('order_shipped', [
+    'language' => 'ar',     // default: the preset's first language
+    'group'    => 'Orders',
+    'submit'   => true,
+]);
+if ($result->submissionFailed()) {
+    // e.g. 'no_template_capable_channel' — fix, then templates()->submit($result->template->id)
+    error_log($result->submissionError);
+}
+
 // WhatsApp groups (Baileys-only)
 $group = $client->groups()->create('Sales pod', ['966500000000', '966500000001']);
 $client->groups()->addParticipants($group->id, ['966500000002']);

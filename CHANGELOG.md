@@ -5,6 +5,34 @@ All notable changes to `getokta/okta-connect-sdk` are documented in this file.
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] — 2026-10-26
+
+### Added
+- **Template library** — `templates()->presets($filters)` lists the
+  platform's ready-made templates (`GET /api/v1/templates/presets`, filters
+  `category` / `group` / `language`) as `TemplatePreset` DTOs with one
+  `TemplatePresetVariant` per language (`variant('ar')`, `variableCount`).
+  `templates()->createFromPreset($key, $options)` copies one into the
+  workspace as a draft (`language`, `channel_id`, `name`, `group`, `submit`)
+  and returns a `TemplateFromPreset`: the template plus the outcome of the
+  optional submission. The template is created even when submission fails —
+  branch on `submissionFailed()` / `submissionError`, not on an exception.
+- **Template authoring** — `templates()->save()` (create or update a draft,
+  `POST /api/v1/templates`), `submit($ulid, ?$channelId)` and `delete($ulid)`.
+  These endpoints already existed on the platform; the SDK had no wrapper.
+  `save()` takes `group`: omit it to keep the folder, null or '' to clear it.
+- `templates()->list()` documents the `category`, `group` and `preset_key`
+  filters.
+- `Template` gains `group`, `presetKey`, `channelId` and `exampleVariables`
+  (+ `isFromPreset()`). `channelId` is the channel to submit through;
+  `exampleVariables` must go back with any edit.
+- `Channel` gains `supportsTemplates` and `wabaId`, so a client can choose a
+  template-capable channel instead of guessing (a QR-paired number has no
+  WABA and is refused with `no_template_capable_channel`).
+
+New constructor parameters are appended with defaults, so existing
+positional construction keeps working.
+
 ## [2.2.0] — 2026-08-19
 
 ### Changed

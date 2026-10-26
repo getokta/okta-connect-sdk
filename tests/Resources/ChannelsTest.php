@@ -178,4 +178,23 @@ final class ChannelsTest extends TestCase
         $this->assertSame('DELETE', $request->getMethod());
         $this->assertSame('/api/v1/channels/ch_1', $request->getUri()->getPath());
     }
+
+    public function test_channel_exposes_template_capability(): void
+    {
+        $client = ResponseFactory::makeClient([
+            ResponseFactory::json(200, [
+                'data' => [
+                    ['id' => 'ch_1', 'type' => 'cloud_api', 'supports_templates' => true, 'waba_id' => 'WABA1'],
+                    ['id' => 'ch_2', 'type' => 'baileys', 'supports_templates' => false, 'waba_id' => null],
+                ],
+            ]),
+        ]);
+
+        [$official, $qr] = $client->channels()->list()->items();
+
+        $this->assertTrue($official->supportsTemplates);
+        $this->assertSame('WABA1', $official->wabaId);
+        $this->assertFalse($qr->supportsTemplates);
+        $this->assertNull($qr->wabaId);
+    }
 }
