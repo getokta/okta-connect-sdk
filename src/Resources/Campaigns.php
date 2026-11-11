@@ -40,9 +40,17 @@ final class Campaigns extends Resource
     /**
      * Create a draft campaign.
      *
-     * Required: `name`, `channel_id`. Optional: `template_id`, `type`
-     * (bulk|drip, default bulk), `audience_filter` (`contact_ids` /
-     * `tag_slugs`).
+     * Required: `name`, `channel_id`, and the message itself: `text` (any
+     * channel that is not an official WhatsApp number) or `template_id` with
+     * `template_params` — one value per `{{N}}` in the template body, in
+     * order; a value may hold contact variables such as `{name}`. The server
+     * answers 422 when the template is not approved or the value count is
+     * wrong, and refuses to queue a campaign that has no message.
+     *
+     * Optional: `type` (bulk|drip, default bulk), `audience_filter`
+     * (`contact_ids` / `tag_slugs` / `engaged_only`). On a QR-linked number
+     * `engaged_only` defaults to true — only people who have written to that
+     * number — pass false to override.
      *
      * @param  array<string, mixed>  $payload
      */

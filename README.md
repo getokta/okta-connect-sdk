@@ -230,6 +230,47 @@ foreach ($client->socialPosts()->get($post->id)->targets as $t) {
 }
 ```
 
+### Members — record each message under the person who sent it
+
+A token belongs to one account, so by default everything you send is signed
+by that one account. Add your own users as members, then name the sender:
+
+```php
+// When your product adds (or changes) an employee. Idempotent on external_id.
+$result = $client->members()->upsert([
+    'external_id' => 'emp-41',          // the id YOUR system knows them by
+    'name' => 'Sara',
+    'email' => 'sara@school.example',   // optional
+    'role' => 'agent',                  // manager | agent (default) | member
+]);
+
+$result->created;                        // true the first time, false after
+
+// Send on their behalf: the inbox, the API and webhooks show «Sara».
+$client->messages()->sendText($channelId, '966500000000', 'تم استلام طلبكم', sender: 'ext:emp-41');
+$client->templates()->send([
+    'channel_id' => $channelId,
+    'wa_id' => '966500000000',
+    'template_name' => 'absence_notice',
+    'variables' => ['أحمد'],
+    'sender' => 'ext:emp-41',
+]);
+
+$message->sender?->externalId;           // 'emp-41' on anything you read back
+
+// When they leave.
+$client->members()->update('ext:emp-41', ['status' => 'suspended']);
+$client->members()->remove('ext:emp-41');
+```
+
+A member is referenced by Connect's id, `ext:<your id>`, or an e-mail.
+Changing members needs the `members` token ability (or `admin`). A repeat
+`upsert()` only touches the fields you pass — it never resets a role set in
+the dashboard or re-activates someone you suspended. A `sender` that is not
+an active member is refused with 422 rather than replaced by someone else.
+Members added this way cannot sign in on their own; they reach the inbox
+through your embedded session (put the member's e-mail in the embed token).
+
 ### Campaigns
 
 Broadcast (bulk / drip) message campaigns: create a draft, then queue it to

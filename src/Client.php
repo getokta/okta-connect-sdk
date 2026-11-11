@@ -18,6 +18,7 @@ use Okta\Connect\WhatsApp\Resources\Emails;
 use Okta\Connect\WhatsApp\Resources\Groups;
 use Okta\Connect\WhatsApp\Resources\Integrations\Meta;
 use Okta\Connect\WhatsApp\Resources\Integrations\QrPairing;
+use Okta\Connect\WhatsApp\Resources\Members;
 use Okta\Connect\WhatsApp\Resources\Messages;
 use Okta\Connect\WhatsApp\Resources\SocialPosts;
 use Okta\Connect\WhatsApp\Resources\Tags;
@@ -40,6 +41,8 @@ final class Client
     private readonly string $baseUrl;
 
     private ?Messages $messages = null;
+
+    private ?Members $members = null;
 
     private ?Conversations $conversations = null;
 
@@ -130,6 +133,11 @@ final class Client
     public function messages(): Messages
     {
         return $this->messages ??= new Messages($this->http);
+    }
+
+    public function members(): Members
+    {
+        return $this->members ??= new Members($this->http);
     }
 
     public function conversations(): Conversations

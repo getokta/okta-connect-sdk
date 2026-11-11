@@ -37,6 +37,23 @@ final class MessageEvent extends WebhookEventData
         return $this->str('message.status');
     }
 
+    /** Connect's id of the member an outbound message was sent as. */
+    public function senderId(): ?string
+    {
+        return $this->str('sender.id');
+    }
+
+    /** The id YOUR system knows that member by (members()->upsert). */
+    public function senderExternalId(): ?string
+    {
+        return $this->str('sender.external_id');
+    }
+
+    public function senderName(): ?string
+    {
+        return $this->str('sender.name');
+    }
+
     public function isReply(): bool
     {
         return $this->bool('message.is_reply');
