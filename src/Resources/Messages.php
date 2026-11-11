@@ -27,6 +27,11 @@ final class Messages extends Resource
      * helpers below (sendText / sendMedia / reply) so the shape is always
      * correct.
      *
+     * `sender` (optional) names the workspace member the message is recorded
+     * under — Connect's id, `ext:<your id>` or an e-mail (see members()).
+     * Without it the message is signed by the token's owner. A sender that
+     * is not an active member is refused (422), never silently replaced.
+     *
      * @param  array<string, mixed>  $payload
      */
     public function send(array $payload, ?string $idempotencyKey = null): Message
@@ -47,14 +52,14 @@ final class Messages extends Resource
      * @param  string  $channelId  The channel ULID to send from.
      * @param  string  $waId  Destination number in E.164 without a leading `+` (e.g. 966500000000).
      */
-    public function sendText(string $channelId, string $waId, string $body, ?string $idempotencyKey = null): Message
+    public function sendText(string $channelId, string $waId, string $body, ?string $idempotencyKey = null, ?string $sender = null): Message
     {
-        return $this->send([
+        return $this->send(self::signed([
             'channel_id' => $channelId,
             'wa_id' => $waId,
             'type' => 'text',
             'body' => $body,
-        ], $idempotencyKey);
+        ], $sender), $idempotencyKey);
     }
 
     /**
@@ -70,26 +75,36 @@ final class Messages extends Resource
         string $mediaUrl,
         string $caption = '',
         ?string $idempotencyKey = null,
+        ?string $sender = null,
     ): Message {
-        return $this->send([
+        return $this->send(self::signed([
             'channel_id' => $channelId,
             'wa_id' => $waId,
             'type' => $type,
             'body' => $caption,
             'media_url' => $mediaUrl,
-        ], $idempotencyKey);
+        ], $sender), $idempotencyKey);
     }
 
     /**
      * Reply into an existing conversation by its ULID.
      */
-    public function reply(string $conversationId, string $body, ?string $idempotencyKey = null): Message
+    public function reply(string $conversationId, string $body, ?string $idempotencyKey = null, ?string $sender = null): Message
     {
-        return $this->send([
+        return $this->send(self::signed([
             'conversation_id' => $conversationId,
             'type' => 'text',
             'body' => $body,
-        ], $idempotencyKey);
+        ], $sender), $idempotencyKey);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private static function signed(array $payload, ?string $sender): array
+    {
+        return $sender === null || $sender === '' ? $payload : $payload + ['sender' => $sender];
     }
 
     /**

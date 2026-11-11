@@ -63,7 +63,13 @@ final class Templates extends Resource
     /**
      * Send a Meta-approved template to a wa_id.
      *
-     * @param  array{channel_id: string, wa_id: string, template_name: string, language?: string, variables?: list<mixed>}  $payload
+     * `header_media_url` is the file for a template whose header is an image,
+     * video or document (the template's reviewed sample is used without it).
+     * `sender` names the member the message is recorded under — see
+     * Messages::send(). The server answers 422 when the template is not
+     * approved or the channel has no templates (a QR-paired number).
+     *
+     * @param  array{channel_id: string, wa_id: string, template_name: string, language?: string, variables?: list<mixed>, header_media_url?: string, sender?: string}  $payload
      */
     public function send(array $payload, ?string $idempotencyKey = null): Message
     {

@@ -30,6 +30,8 @@ final class Message
         public readonly ?string $body,
         public readonly ?string $createdAt,
         public readonly array $extra = [],
+        /** Who wrote an outbound message; null for inbound and for bots. */
+        public readonly ?MessageSender $sender = null,
     ) {}
 
     /**
@@ -50,7 +52,9 @@ final class Message
             status: isset($data['status']) && is_string($data['status']) ? MessageStatus::tryFrom($data['status']) : null,
             body: isset($data['body']) ? (string) $data['body'] : null,
             createdAt: isset($data['created_at']) ? (string) $data['created_at'] : null,
+            // `sender` also stays in `extra`, where it lived before it was typed.
             extra: $extra,
+            sender: isset($data['sender']) && is_array($data['sender']) ? MessageSender::fromArray($data['sender']) : null,
         );
     }
 
